@@ -25,6 +25,10 @@ Uint32 tile::getColor(SDL_Surface& winSurface)
 			// End
 			return SDL_MapRGB(winSurface.format, 255, 0, 0);
 			break;
+		case(4):
+			// Uninitialized
+			std::cout << "Attempted to read color of an uninitialized tile." << std::endl;
+			break;
 		default:
 			std::cout << "Unknown state. State is " << state_ << std::endl;
 	}

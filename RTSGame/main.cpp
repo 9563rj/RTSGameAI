@@ -33,18 +33,25 @@ int main(int argc, char** args)
 	}
 
 	// Map init
-	std::vector<std::vector<tile>> tiles = { {0,1,2},{0,0,0},{3,1,0} };
+	std::vector<std::vector<tile>> tiles = { 
+		{0,0,0,0,3},
+		{1,1,0,1,1},
+		{2,0,0,0,0} 
+	};
+	// Load bmp and write to tiles
+	SDL_Surface* mapsurface = SDL_LoadBMP("map.bmp");
+
 	SDL_Rect drawRect;
 	drawRect.h = tilesize;
 	drawRect.w = tilesize;
 	// Draw init map
-	for (int j = 0; j<tiles.size(); j++)
+	for (int i = 0; i<tiles[0].size(); i++)
 	{
-		for (int i = 0; i<tiles.size(); i++)
+		for (int j = 0; j<tiles.size(); j++)
 		{
 			drawRect.x = i * tilesize;
 			drawRect.y = j * tilesize;
-			SDL_FillRect(winSurface, &drawRect, tiles[i][j].getColor(*winSurface));
+			SDL_FillRect(winSurface, &drawRect, tiles[j][i].getColor(*winSurface));
 		}
 	}
 	SDL_UpdateWindowSurface(window);
@@ -59,6 +66,8 @@ int main(int argc, char** args)
 	}
 
 	// Cleanup
+	SDL_FreeSurface(winSurface);
+	SDL_FreeSurface(mapsurface); 
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 	return 0;
