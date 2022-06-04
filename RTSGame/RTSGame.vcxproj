@@ -142,10 +142,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="drawmap.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="astar.cpp" />
     <ClCompile Include="tile.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="astar.h" />
+    <ClInclude Include="drawmap.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="tile.h" />
   </ItemGroup>

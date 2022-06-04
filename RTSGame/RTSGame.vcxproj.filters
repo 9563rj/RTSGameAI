@@ -21,12 +21,24 @@
     <ClCompile Include="tile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="astar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="drawmap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="tile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="astar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="drawmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

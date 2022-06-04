@@ -1,7 +1,7 @@
 #include "main.h"
+#include "drawmap.h"
+#include "astar.h"
 #include "tile.h"
-
-const int tilesize = 25;
 
 int main(int argc, char** args)
 {
@@ -33,41 +33,121 @@ int main(int argc, char** args)
 	}
 
 	// Map init
-	std::vector<std::vector<tile>> tiles = { 
+	/*std::vector<std::vector<tile>> tiles = {
 		{0,0,0,0,3},
 		{1,1,0,1,1},
 		{2,0,0,0,0} 
+	};*/
+	std::vector<std::vector<tile>> tiles = {
+		{0,3},
+		{2,0}
 	};
-	// Load bmp and write to tiles
-	SDL_Surface* mapsurface = SDL_LoadBMP("map.bmp");
-
-	SDL_Rect drawRect;
-	drawRect.h = tilesize;
-	drawRect.w = tilesize;
-	// Draw init map
-	for (int i = 0; i<tiles[0].size(); i++)
+	// Debug
+	std::cout << "Attempting to initialize tileset" << std::endl;
+	std::system("pause");
+	for (int i = 0; i < tiles.size(); i++)
 	{
-		for (int j = 0; j<tiles.size(); j++)
+		for (int j = 0; j < tiles[0].size(); j++)
 		{
-			drawRect.x = i * tilesize;
-			drawRect.y = j * tilesize;
-			SDL_FillRect(winSurface, &drawRect, tiles[j][i].getColor(*winSurface));
+			tiles[i][j].x_ = j;
+			tiles[i][j].y_ = i;
 		}
 	}
-	SDL_UpdateWindowSurface(window);
-
-	// Main game loop
-	bool gameRunning = true;
-	while (gameRunning)
+	// Debug
+	std::cout << "Attempted to initalize tileset" << std::endl;
+	std::system("pause");
+	/* Load bmpand write to tiles
+	SDL_Surface* mapsurface = NULL;
+	mapsurface = SDL_LoadBMP("map.bmp");
+	if (mapsurface == NULL)
 	{
-		gameRunning = false;
-		SDL_UpdateWindowSurface(window);
+		std::cout << "Failed to load map.bmp" << std::endl;
 		std::system("pause");
 	}
-
+	else
+	{
+		std::cout << "Successfully loaded map.bmp" << std::endl;
+		std::cout << "Format is " << SDL_PIXELTYPE(mapsurface->format->format)<< std::endl;
+	}
+	Uint32* pixelsvar = NULL;
+	std::cout << "Debug: Attempting to init pixelsvar" << std::endl;
+	std::system("pause");
+	pixelsvar = (Uint32 *)mapsurface->pixels;
+	if (pixelsvar == NULL)
+	{
+		std::cout << "Debug: Failed to init pixelsvar" << std::endl;
+		std::system("pause");
+	}
+	else
+	{
+		std::cout << "Debug: Successfully init pixelsvar" << std::endl;
+		std::system("pause");
+	}
+	std::vector<std::vector<Uint32>> mapcolors;
+	std::cout << "Debug: Code block 1 starting" << std::endl;
+	std::system("pause");
+	for (int i = 0; i < mapsurface->h; i++)
+	{
+		std::vector<Uint32> row;
+		row.clear();
+		for (int j = 0; j < mapsurface->w; j++)
+		{
+			row.push_back(pixelsvar[(i * mapsurface->w) + j]);
+		}
+		mapcolors.push_back(row);
+	}
+	std::cout << "Debug: Code block 2 starting" << std::endl;
+	std::system("pause");
+	for (int i = 0; i < mapcolors.size(); i++)
+	{
+		for (int j = 0; j < mapcolors[0].size(); j++)
+		{
+			if (mapcolors[j][i] == SDL_MapRGB(mapsurface->format, 0, 0, 0)) 
+			{
+				tiles[i][j] = 0; 
+				std::cout << "Successfully set state 0 at x=" << j << " y=" << i << std::endl;
+			}
+			else if (mapcolors[j][i] == SDL_MapRGB(mapsurface->format, 255, 255, 255)) 
+			{ 
+				tiles[i][j] = 1; 
+				std::cout << "Successfully set state 1 at x=" << j << " y=" << i << std::endl;
+			}
+			else if (mapcolors[j][i] == SDL_MapRGB(mapsurface->format, 0, 255, 0)) 
+			{ 
+				tiles[i][j] = 2; 
+				std::cout << "Successfully set state 2 at x=" << j << " y=" << i << std::endl;
+			}
+			else if (mapcolors[j][i] == SDL_MapRGB(mapsurface->format, 255, 0, 0)) 
+			{
+				tiles[i][j] = 3; 
+				std::cout << "Successfully set state 3 at x=" << j << " y=" << i << std::endl;
+			}
+			else 
+			{ 
+				std::cout << "Error reading map.bmp at x=" << j << " and y=" << i << std::endl;
+				std::cout << "Actual value was " << mapcolors[j][i] << std::endl;
+				std::cout << "Expected value was probably " << SDL_MapRGB(mapsurface->format, 255, 255, 255) << std::endl;
+				std::system("pause");
+			}
+			
+		}
+	}
+	*/
+	// Draw initialized map
+	drawMap(winSurface, window, tiles);
+	// Debug pause
+	std::cout << "Attempted to draw map" << std::endl;
+	std::system("pause");
+	// Run astar
+	std::vector<tile*> path = astar(winSurface, window, tiles);
+	for (int i = 0; i < path.size(); i++)
+	{
+		path[i]->state_ = 5;
+	}
+	drawMap(winSurface, window, tiles);
 	// Cleanup
 	SDL_FreeSurface(winSurface);
-	SDL_FreeSurface(mapsurface); 
+	//SDL_FreeSurface(mapsurface); 
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 	return 0;

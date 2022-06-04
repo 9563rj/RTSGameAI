@@ -5,6 +5,29 @@ tile::tile(const int& state)
 	state_ = state;
 }
 
+int tile::distTo(tile* dest)
+{
+	int numHoriMoves;
+	int numVertMoves;
+	int numLinearMoves;
+	int numDiagMoves;
+	if (x_ < dest->x_) { numHoriMoves = dest->x_ - x_; }
+	else { numHoriMoves = x_ - dest->x_; }
+	if (y_ < dest->y_) { numVertMoves = dest->y_ - y_; }
+	else { numVertMoves = y_ - dest->y_; }
+	if (numHoriMoves < numVertMoves)
+	{
+		numLinearMoves = numVertMoves - numHoriMoves;
+		numDiagMoves = numVertMoves - numLinearMoves;
+	}
+	else
+	{
+		numLinearMoves = numHoriMoves - numVertMoves;
+		numDiagMoves = numHoriMoves - numLinearMoves;
+	}
+	return numLinearMoves * 10 + numDiagMoves * 14;
+}
+
 Uint32 tile::getColor(SDL_Surface& winSurface)
 {
 	switch(state_)
