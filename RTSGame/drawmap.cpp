@@ -38,5 +38,4 @@ void drawMap(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vecto
 	}
 	SDL_UpdateWindowSurface(window);
 	std::cout << "Attempted update to window surface" << std::endl;
-	std::system("pause");
 }

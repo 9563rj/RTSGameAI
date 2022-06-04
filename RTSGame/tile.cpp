@@ -3,6 +3,7 @@
 tile::tile(const int& state)
 {
 	state_ = state;
+	openclosed = 2;
 }
 
 int tile::distTo(tile* dest)
@@ -51,6 +52,10 @@ Uint32 tile::getColor(SDL_Surface& winSurface)
 		case(4):
 			// Uninitialized
 			std::cout << "Attempted to read color of an uninitialized tile." << std::endl;
+			break;
+		case(5):
+			// Finished path
+			return SDL_MapRGB(winSurface.format, 0, 0, 255);
 			break;
 		default:
 			std::cout << "Unknown state. State is " << state_ << std::endl;

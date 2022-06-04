@@ -33,14 +33,12 @@ int main(int argc, char** args)
 	}
 
 	// Map init
-	/*std::vector<std::vector<tile>> tiles = {
-		{0,0,0,0,3},
-		{1,1,0,1,1},
-		{2,0,0,0,0} 
-	};*/
 	std::vector<std::vector<tile>> tiles = {
-		{0,3},
-		{2,0}
+		{3,0,0,0,1},
+		{1,1,0,1,1},
+		{0,1,1,0,0},
+		{0,0,0,1,1},
+		{2,1,0,0,0}
 	};
 	// Debug
 	std::cout << "Attempting to initialize tileset" << std::endl;
@@ -136,8 +134,7 @@ int main(int argc, char** args)
 	// Draw initialized map
 	drawMap(winSurface, window, tiles);
 	// Debug pause
-	std::cout << "Attempted to draw map" << std::endl;
-	std::system("pause");
+	std::cout << "Attempted to draw init map" << std::endl;
 	// Run astar
 	std::vector<tile*> path = astar(winSurface, window, tiles);
 	for (int i = 0; i < path.size(); i++)
@@ -145,6 +142,8 @@ int main(int argc, char** args)
 		path[i]->state_ = 5;
 	}
 	drawMap(winSurface, window, tiles);
+	std::cout << "Found path" << std::endl;
+	std::system("pause");
 	// Cleanup
 	SDL_FreeSurface(winSurface);
 	//SDL_FreeSurface(mapsurface); 
