@@ -10,7 +10,7 @@ void drawMap(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vecto
 		for (int j = 0; j < tiles.size(); j++)
 		{
 			//Debug
-			std::cout << "Attempting to draw tile x=" << i << " y=" << j << std::endl;
+			//std::cout << "Attempting to draw tile x=" << i << " y=" << j << std::endl;
 			drawRect.x = i * tilesize;
 			drawRect.y = j * tilesize;
 			SDL_FillRect(winSurface, &drawRect, tiles[j][i].getColor(*winSurface));
@@ -37,5 +37,5 @@ void drawMap(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vecto
 		}
 	}
 	SDL_UpdateWindowSurface(window);
-	std::cout << "Attempted update to window surface" << std::endl;
+	//std::cout << "Attempted update to window surface" << std::endl;
 }

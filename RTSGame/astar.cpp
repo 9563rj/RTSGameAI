@@ -7,6 +7,7 @@ std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vecto
 	std::list<tile*> closed;
 	tile* current = NULL;
 	tile* goal = NULL;
+	tile* begin = NULL;
 	for (int i = 0; i < tiles.size(); i++)
 	{
 		for (int j = 0; j < tiles[0].size(); j++)
@@ -16,9 +17,14 @@ std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vecto
 				goal = &tiles[i][j];
 			}
 			if (tiles[i][j].state_ == 2)
+			{
 				current = &tiles[i][j];
+				begin = current;
+			}
 		}
 	}
+	assert(goal != NULL);
+	assert(current != NULL);
 	// Begin algorithm
 	// calculate start point f,g,h
 	current->h_=current->distTo(goal);
@@ -33,6 +39,7 @@ std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vecto
 		int index;
 		for (auto tile:open)
 		{
+			tile->f_ = tile->g_ + tile->h_;
 			fvalues.push_back(tile);
 		}
 		for (int i = 0; i < fvalues.size(); i++)
@@ -87,7 +94,7 @@ std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vecto
 				if (tiles[ni][nj].state_ == 1) continue;
 
 				successors.push_back(&tiles[ni][nj]);
-				std::cout << "Successor found at " << ni << " " << nj << std::endl;
+				//std::cout << "Successor found at " << ni << " " << nj << std::endl;
 			}
 		}
 		// compute successor f,g,h and open/closed
@@ -132,11 +139,17 @@ std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vecto
 	system("pause");
 	exit(1);
 GET_MOVE_SEQUENCE:
-	int pathcurrentx = current->x_;
+	std::vector<tile*> path;
+	while (current != begin)
+	{
+		path.push_back(current);
+		current = current->parent_;
+	}
+	/*int pathcurrentx = current->x_;
 	int pathcurrenty = current->y_;
 	int pathnextx = tiles[current->y_][current->x_].parent_->x_;
 	int pathnexty = tiles[current->y_][current->x_].parent_->y_;
-	std::vector<tile*> path;
+	
 	while (tiles[pathcurrenty][pathcurrentx].state_ != 2)
 	{
 		path.push_back(&tiles[pathcurrenty][pathcurrentx]);
@@ -144,6 +157,6 @@ GET_MOVE_SEQUENCE:
 		pathcurrenty = pathnexty;
 		pathnextx = tiles[pathcurrenty][pathcurrentx].parent_->x_;
 		pathnexty = tiles[pathcurrenty][pathcurrentx].parent_->y_;
-	}
+	}*/
 	return path;
 }
