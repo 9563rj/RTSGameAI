@@ -45,7 +45,7 @@ Uint32 tile::getColor(SDL_Surface& winSurface)
 			// Start
 			return SDL_MapRGB(winSurface.format, 0, 255, 0);
 			break;
-		case(3):
+		case(3): 
 			// End
 			return SDL_MapRGB(winSurface.format, 255, 0, 0);
 			break;

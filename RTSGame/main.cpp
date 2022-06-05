@@ -33,32 +33,20 @@ int main(int argc, char** args)
 	}
 
 	// Map init
-	std::ifstream map("map.txt");
-	std::string buffer;
-	std::vector<std::vector<tile>> tiles;
-	while (getline(map, buffer))
-	{
-		std::cout << buffer << std::endl;
-		std::vector<tile> row;
-		row.clear();
-		for (char ch : buffer)
-		{
-			int state = ch - '0';
-			row.push_back(tile(state));
+	std::vector<std::vector<tile*>> tiles;
+	initMap(tiles, false);
+	std::cout << "map has height " << tiles.size() << std::endl;
+	std::cout << "map has width" << tiles[0].size() << std::endl;
+	for (auto row : tiles) {
+		for (auto tile : row) {
+			printf("(%d,%d)", tile->y_, tile->x_);
 		}
-		tiles.push_back(row);
 	}
+
 	drawMap(winSurface, window, tiles);
 	// Debug
 	std::cout << "Attempting to initialize tileset" << std::endl;
-	for (int i = 0; i < tiles.size(); i++)
-	{
-		for (int j = 0; j < tiles[0].size(); j++)
-		{
-			tiles[i][j].x_ = j;
-			tiles[i][j].y_ = i;
-		}
-	}
+
 	// Debug
 	std::cout << "Attempted to initalize tileset" << std::endl;
 	// Draw initialized map
@@ -72,7 +60,6 @@ int main(int argc, char** args)
 		path[i]->state_ = 5;
 	}
 	drawMap(winSurface, window, tiles);
-	std::cout << "Found path" << std::endl;
 
 	// Event loop
 	bool gameRunning = true;
@@ -80,8 +67,6 @@ int main(int argc, char** args)
 	while (gameRunning)
 	{
 		SDL_PollEvent(&event);
-		SDL_Delay(50);
-		drawMap(winSurface, window, tiles);
 		switch (event.type)
 		{
 			case(SDL_QUIT):
@@ -94,7 +79,23 @@ int main(int argc, char** args)
 						gameRunning = false;
 						break;
 				}
+			case(SDL_MOUSEBUTTONUP):
+				int mousex;
+				int mousey;
+				SDL_GetMouseState(&mousex, &mousey);
+				int row = mousey / tilesize;
+				int column = mousex / tilesize;
+				std::cout << "setting new goal to r=" << row << " and c=" << column << std::endl;
+				initMap(tiles, true);
+				tiles[row][column]->state_ = 3;
+				path.clear();
+				path = astar(winSurface, window, tiles);
+				for (int i = 0; i < path.size(); i++)
+				{
+					path[i]->state_ = 5;
+				}
 		}
+		drawMap(winSurface, window, tiles);
 	}
 	// Cleanup
 	SDL_FreeSurface(winSurface);

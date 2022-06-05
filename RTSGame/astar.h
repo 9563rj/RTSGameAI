@@ -4,4 +4,4 @@
 #include "drawmap.h"
 #include <cassert>
 #include <list>
-std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vector<tile>>& tiles);
+std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vector<tile*>>& tiles);

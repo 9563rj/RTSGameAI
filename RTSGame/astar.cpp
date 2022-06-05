@@ -1,6 +1,6 @@
 #include "astar.h"
 
-std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vector<tile>> &tiles)
+std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vector<tile*>> &tiles)
 {
 	// Initialization
 	std::list<tile*> open;
@@ -8,23 +8,34 @@ std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vecto
 	tile* current = NULL;
 	tile* goal = NULL;
 	tile* begin = NULL;
+	drawMap(winSurface, window, tiles);
 	for (int i = 0; i < tiles.size(); i++)
 	{
 		for (int j = 0; j < tiles[0].size(); j++)
 		{
-			if (tiles[i][j].state_ == 3) 
+			if (tiles[i][j]->state_ == 3) 
 			{
-				goal = &tiles[i][j];
+				goal = tiles[i][j];
 			}
-			if (tiles[i][j].state_ == 2)
+			if (tiles[i][j]->state_ == 2)
 			{
-				current = &tiles[i][j];
+				current = tiles[i][j];
 				begin = current;
 			}
 		}
 	}
-	assert(goal != NULL);
-	assert(current != NULL);
+	if (goal == NULL)
+	{
+		std::cout << "Goal is null" << std::endl;
+		system("pause");
+		exit(1);
+	}
+	if (current == NULL)
+	{
+		std::cout << "Current is null" << std::endl;
+		system("pause");
+		exit(1);
+	}
 	// Begin algorithm
 	// calculate start point f,g,h
 	current->h_=current->distTo(goal);
@@ -56,26 +67,10 @@ std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vecto
 		if (current == goal) { goto GET_MOVE_SEQUENCE; }
 		// generate successors
 		std::list<tile*> successors;
-
-		/*
-		for (int i = -1; i <= 1; i++)
-		{
-			for (int j = -1; j <= 1; j++)
-			{
-				if (current->x_+j>-1 && current->y_+i > -1 && current->y_+i<=tiles.size() && current->x_+j<=tiles[0].size() && current->state_ != 1)
-				{
-					if (!(j == 0 && i == 0)) 
-					{ 
-						successors.push_back(&tiles[current->x_ + j][current->y_ + i]);
-						std::cout << "Successor found at " << current->x_ + j << " " << current->y_ + i << std::endl;
-					}
-				}
-			}
-		}
-		*/
-
 		int maph = tiles.size();
 		int mapw = tiles[0].size();
+		std::cout << "Map height is " << maph << std::endl;
+		std::cout << "Map width is " << mapw << std::endl;
 
 		for (int i = -1; i <= 1; i++)
 		{
@@ -91,10 +86,10 @@ std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vecto
 				if (nj < 0) continue;
 				if (ni >= maph) continue;
 				if (nj >= mapw) continue;
-				if (tiles[ni][nj].state_ == 1) continue;
+				if (tiles[ni][nj]->state_ == 1) continue;
 
-				successors.push_back(&tiles[ni][nj]);
-				//std::cout << "Successor found at " << ni << " " << nj << std::endl;
+				successors.push_back(tiles[ni][nj]);
+				std::cout << "Found " << successors.size() << " neighbors" << std::endl;
 			}
 		}
 		// compute successor f,g,h and open/closed
@@ -145,18 +140,6 @@ GET_MOVE_SEQUENCE:
 		path.push_back(current);
 		current = current->parent_;
 	}
-	/*int pathcurrentx = current->x_;
-	int pathcurrenty = current->y_;
-	int pathnextx = tiles[current->y_][current->x_].parent_->x_;
-	int pathnexty = tiles[current->y_][current->x_].parent_->y_;
-	
-	while (tiles[pathcurrenty][pathcurrentx].state_ != 2)
-	{
-		path.push_back(&tiles[pathcurrenty][pathcurrentx]);
-		pathcurrentx = pathnextx;
-		pathcurrenty = pathnexty;
-		pathnextx = tiles[pathcurrenty][pathcurrentx].parent_->x_;
-		pathnexty = tiles[pathcurrenty][pathcurrentx].parent_->y_;
-	}*/
+	std::cout << "Found path" << std::endl;
 	return path;
 }
