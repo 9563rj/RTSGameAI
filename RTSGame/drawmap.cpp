@@ -70,3 +70,19 @@ void initMap(std::vector<std::vector<tile*>> &tiles, bool skiptarg, bool skipsta
 	std::cout << "read map with height" << tiles.size() << std::endl;
 	std::cout << "read map with width "<< std::endl;
 }
+std::vector<int> getNode(std::vector<std::vector<tile*>>& tiles, int state)
+{
+	for (int r = 0; r < tiles.size(); r++)
+	{
+		for (int c = 0; c < tiles[0].size(); c++)
+		{
+			if (tiles[r][c]->state_ == state)
+			{
+				std::vector<int> values;
+				values.push_back(r);
+				values.push_back(c);
+				return values;
+			}
+		}
+	}
+}

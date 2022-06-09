@@ -8,6 +8,7 @@ struct tile
 	Uint32 getColor(SDL_Surface& winSurface);
 	int distTo(tile* dest);
 	int openclosed;
+	bool onpath;
 	int x_;
 	int y_;
 	int f_;

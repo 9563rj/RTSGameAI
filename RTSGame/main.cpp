@@ -2,6 +2,7 @@
 #include "drawmap.h"
 #include "astar.h"
 #include "tile.h"
+#include "unit.h"
 
 int main(int argc, char** args)
 {
@@ -42,22 +43,7 @@ int main(int argc, char** args)
 			printf("(%d,%d)", tile->y_, tile->x_);
 		}
 	}
-
-	drawMap(winSurface, window, tiles);
-	// Debug
-	std::cout << "Attempting to initialize tileset" << std::endl;
-	// Debug
-	std::cout << "Attempted to initalize tileset" << std::endl;
 	// Draw initialized map
-	drawMap(winSurface, window, tiles);
-	// Debug pause
-	std::cout << "Attempted to draw init map" << std::endl;
-	// Run astar
-	std::vector<tile*> path = astar(winSurface, window, tiles);
-	for (int i = 0; i < path.size(); i++)
-	{
-		path[i]->state_ = 5;
-	}
 	drawMap(winSurface, window, tiles);
 
 	// Event loop
@@ -83,6 +69,9 @@ int main(int argc, char** args)
 			}
 		}
 	}
+	// Create unit, initialize, create path variable
+	unit hero(tiles, 0, startr, startc, window, winSurface);
+	std::vector<tile*> path;
 	while (gameRunning)
 	{
 		SDL_PollEvent(&event);
@@ -108,35 +97,20 @@ int main(int argc, char** args)
 					int column = mousex / tilesize;
 					targr = row;
 					targc = column;
-					std::cout << "setting new goal to r=" << row << " and c=" << column << std::endl;
-					initMap(tiles, true, true);
-					tiles[row][column]->state_ = 3;
-					tiles[startr][startc]->state_ = 2;
-					path.clear();
-					path = astar(winSurface, window, tiles);
-					for (int i = 0; i < path.size(); i++)
+					if (tiles[row][column]->state_ != 1)
 					{
-						path[i]->state_ = 5;
-					}
-				}
-				else if (event.button.button == SDL_BUTTON_RIGHT)
-				{
-					int mousex;
-					int mousey;
-					SDL_GetMouseState(&mousex, &mousey);
-					int row = mousey / tilesize;
-					int column = mousex / tilesize;
-					startr = row;
-					startc = column;
-					std::cout << "setting new start to r=" << row << " and c=" << column << std::endl;
-					initMap(tiles, true, true);
-					tiles[targr][targc]->state_ = 3;
-					tiles[row][column]->state_ = 2;
-					path.clear();
-					path = astar(winSurface, window, tiles);
-					for (int i = 0; i < path.size(); i++)
-					{
-						path[i]->state_ = 5;
+						for (int r = 0; r < tiles.size(); r++)
+						{
+							for (int c = 0; c < tiles[0].size(); c++)
+							{
+								tiles[r][c]->onpath = false;
+							}
+						}
+						std::cout << "setting new goal to r=" << row << " and c=" << column << std::endl;
+						tiles[row][column]->state_ = 3;
+						path.clear();
+						path = astar(winSurface, window, tiles);
+						hero.advance(tiles, path);
 					}
 				}
 		}

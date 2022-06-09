@@ -146,12 +146,14 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="astar.cpp" />
     <ClCompile Include="tile.cpp" />
+    <ClCompile Include="unit.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="astar.h" />
     <ClInclude Include="drawmap.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="tile.h" />
+    <ClInclude Include="unit.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

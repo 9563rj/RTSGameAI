@@ -8,7 +8,6 @@ std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vecto
 	tile* current = NULL;
 	tile* goal = NULL;
 	tile* begin = NULL;
-	drawMap(winSurface, window, tiles);
 	for (int i = 0; i < tiles.size(); i++)
 	{
 		for (int j = 0; j < tiles[0].size(); j++)
@@ -22,6 +21,7 @@ std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vecto
 				current = tiles[i][j];
 				begin = current;
 			}
+			tiles[i][j]->openclosed = 2;
 		}
 	}
 	if (goal == NULL)
@@ -127,8 +127,6 @@ std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vecto
 		{
 			tile->openclosed = 1;
 		}
-		// Draw map each iteration
-		drawMap(winSurface, window, tiles);
 	}
 	std::cout << "Error: Open list became empty" << std::endl;
 	system("pause");
@@ -140,6 +138,7 @@ GET_MOVE_SEQUENCE:
 		path.push_back(current);
 		current = current->parent_;
 	}
+	std::reverse(path.begin(), path.end());
 	std::cout << "Found path" << std::endl;
 	return path;
 }

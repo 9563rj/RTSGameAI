@@ -4,4 +4,5 @@
 #include <vector>
 #include <fstream>
 #include <string>
+#include <algorithm>
 const int tilesize = 25;
