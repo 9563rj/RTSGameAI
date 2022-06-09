@@ -34,7 +34,7 @@ int main(int argc, char** args)
 
 	// Map init
 	std::vector<std::vector<tile*>> tiles;
-	initMap(tiles, false);
+	initMap(tiles, false, false);
 	std::cout << "map has height " << tiles.size() << std::endl;
 	std::cout << "map has width" << tiles[0].size() << std::endl;
 	for (auto row : tiles) {
@@ -46,7 +46,6 @@ int main(int argc, char** args)
 	drawMap(winSurface, window, tiles);
 	// Debug
 	std::cout << "Attempting to initialize tileset" << std::endl;
-
 	// Debug
 	std::cout << "Attempted to initalize tileset" << std::endl;
 	// Draw initialized map
@@ -64,6 +63,26 @@ int main(int argc, char** args)
 	// Event loop
 	bool gameRunning = true;
 	SDL_Event event;
+	int targr;
+	int targc;
+	int startr;
+	int startc;
+	for (int r = 0; r < tiles.size(); r++)
+	{
+		for (int c = 0; c < tiles[0].size(); c++)
+		{
+			if (tiles[r][c]->state_ == 3)
+			{
+				targr = r;
+				targc = c;
+			}
+			if (tiles[r][c]->state_ == 2)
+			{
+				startr = r;
+				startc = c;
+			}
+		}
+	}
 	while (gameRunning)
 	{
 		SDL_PollEvent(&event);
@@ -80,19 +99,45 @@ int main(int argc, char** args)
 						break;
 				}
 			case(SDL_MOUSEBUTTONUP):
-				int mousex;
-				int mousey;
-				SDL_GetMouseState(&mousex, &mousey);
-				int row = mousey / tilesize;
-				int column = mousex / tilesize;
-				std::cout << "setting new goal to r=" << row << " and c=" << column << std::endl;
-				initMap(tiles, true);
-				tiles[row][column]->state_ = 3;
-				path.clear();
-				path = astar(winSurface, window, tiles);
-				for (int i = 0; i < path.size(); i++)
+				if (event.button.button == SDL_BUTTON_LEFT)
 				{
-					path[i]->state_ = 5;
+					int mousex;
+					int mousey;
+					SDL_GetMouseState(&mousex, &mousey);
+					int row = mousey / tilesize;
+					int column = mousex / tilesize;
+					targr = row;
+					targc = column;
+					std::cout << "setting new goal to r=" << row << " and c=" << column << std::endl;
+					initMap(tiles, true, true);
+					tiles[row][column]->state_ = 3;
+					tiles[startr][startc]->state_ = 2;
+					path.clear();
+					path = astar(winSurface, window, tiles);
+					for (int i = 0; i < path.size(); i++)
+					{
+						path[i]->state_ = 5;
+					}
+				}
+				else if (event.button.button == SDL_BUTTON_RIGHT)
+				{
+					int mousex;
+					int mousey;
+					SDL_GetMouseState(&mousex, &mousey);
+					int row = mousey / tilesize;
+					int column = mousex / tilesize;
+					startr = row;
+					startc = column;
+					std::cout << "setting new start to r=" << row << " and c=" << column << std::endl;
+					initMap(tiles, true, true);
+					tiles[targr][targc]->state_ = 3;
+					tiles[row][column]->state_ = 2;
+					path.clear();
+					path = astar(winSurface, window, tiles);
+					for (int i = 0; i < path.size(); i++)
+					{
+						path[i]->state_ = 5;
+					}
 				}
 		}
 		drawMap(winSurface, window, tiles);

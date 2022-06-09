@@ -39,7 +39,7 @@ void drawMap(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vecto
 	SDL_UpdateWindowSurface(window);
 	//std::cout << "Attempted update to window surface" << std::endl;
 }
-void initMap(std::vector<std::vector<tile*>> &tiles, bool skiptarg)
+void initMap(std::vector<std::vector<tile*>> &tiles, bool skiptarg, bool skipstart)
 {
 	tiles.clear();
 	std::ifstream map("map.txt");
@@ -53,6 +53,7 @@ void initMap(std::vector<std::vector<tile*>> &tiles, bool skiptarg)
 		{
 			int state = ch - '0';
 			if (skiptarg && state == 3) { state = 0; }
+			if (skipstart && state == 2) { state = 0; }
 			row.push_back(new tile(state));
 		}
 		tiles.push_back(row);
