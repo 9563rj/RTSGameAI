@@ -3,6 +3,9 @@
 #include "astar.h"
 #include "tile.h"
 #include "unit.h"
+#include "player.h"
+
+const int tilesize = 25;
 
 int main(int argc, char** args)
 {
@@ -37,18 +40,13 @@ int main(int argc, char** args)
 	std::vector<std::vector<tile*>> tiles;
 	initMap(tiles, false, false);
 	std::cout << "map has height " << tiles.size() << std::endl;
-	std::cout << "map has width" << tiles[0].size() << std::endl;
+	std::cout << "map has width " << tiles[0].size() << std::endl;
 	for (auto row : tiles) {
 		for (auto tile : row) {
 			printf("(%d,%d)", tile->y_, tile->x_);
 		}
 	}
-	// Draw initialized map
-	drawMap(winSurface, window, tiles);
-
-	// Event loop
-	bool gameRunning = true;
-	SDL_Event event;
+	// init units up here to draw
 	int targr;
 	int targc;
 	int startr;
@@ -69,9 +67,22 @@ int main(int argc, char** args)
 			}
 		}
 	}
-	// Create unit, initialize, create path variable
+	std::list<unit*> units;
 	unit hero(tiles, 0, startr, startc, window, winSurface);
+	units.push_back(&hero);
+	// Draw initialized map
+	drawMap(winSurface, window, tiles, units);
+
+	// Event loop
+	bool gameRunning = true;
+	SDL_Event event;
+	
+	// Create unit, initialize, create path variable
+	player p1(0, &hero, *winSurface);
+	std::vector<player*> players;
+	players.push_back(&p1);
 	std::vector<tile*> path;
+	unit* currentunit = &hero;
 	while (gameRunning)
 	{
 		SDL_PollEvent(&event);
@@ -95,26 +106,51 @@ int main(int argc, char** args)
 					SDL_GetMouseState(&mousex, &mousey);
 					int row = mousey / tilesize;
 					int column = mousex / tilesize;
-					targr = row;
-					targc = column;
-					if (tiles[row][column]->state_ != 1)
+					bool cont = true;
+					for (auto unit : units)
 					{
-						for (int r = 0; r < tiles.size(); r++)
+						if (unit->tileAt_->y_ == row && unit->tileAt_->x_ == column)
 						{
-							for (int c = 0; c < tiles[0].size(); c++)
-							{
-								tiles[r][c]->onpath = false;
-							}
+							currentunit = unit;
+							cont = false;
 						}
-						std::cout << "setting new goal to r=" << row << " and c=" << column << std::endl;
-						tiles[row][column]->state_ = 3;
-						path.clear();
-						path = astar(winSurface, window, tiles);
-						hero.advance(tiles, path);
+					}
+					if (cont)
+					{
+						targr = row;
+						targc = column;
+						if (tiles[row][column]->state_ != 1)
+						{
+							for (int r = 0; r < tiles.size(); r++)
+							{
+								for (int c = 0; c < tiles[0].size(); c++)
+								{
+									tiles[r][c]->onpath = false;
+								}
+							}
+							std::cout << "setting new goal to r=" << row << " and c=" << column << std::endl;
+							// tiles[row][column]->state_ = 3;
+							currentunit->navigate(tiles, tiles[row][column], winSurface, window);
+						}
 					}
 				}
+				else if (event.button.button == SDL_BUTTON_RIGHT)
+				{
+					int mousex;
+					int mousey;
+					SDL_GetMouseState(&mousex, &mousey);
+					int row = mousey / tilesize;
+					int column = mousex / tilesize;
+					units.push_back(new unit(tiles, 0, row, column, window, winSurface));
+					players.push_back(new player(players.size(), units.back(), *winSurface));
+				}
+				break;
 		}
-		drawMap(winSurface, window, tiles);
+		for(auto unit : units)
+		{
+			unit->advance(tiles);
+		}
+		drawMap(winSurface, window, tiles, units);
 	}
 	// Cleanup
 	SDL_FreeSurface(winSurface);

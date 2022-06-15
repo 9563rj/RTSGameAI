@@ -145,6 +145,7 @@
     <ClCompile Include="drawmap.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="astar.cpp" />
+    <ClCompile Include="player.cpp" />
     <ClCompile Include="tile.cpp" />
     <ClCompile Include="unit.cpp" />
   </ItemGroup>
@@ -152,6 +153,7 @@
     <ClInclude Include="astar.h" />
     <ClInclude Include="drawmap.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="player.h" />
     <ClInclude Include="tile.h" />
     <ClInclude Include="unit.h" />
   </ItemGroup>

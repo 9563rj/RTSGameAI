@@ -5,4 +5,5 @@
 #include <fstream>
 #include <string>
 #include <algorithm>
-const int tilesize = 25;
+#include <list>
+extern const int tilesize;

@@ -1,6 +1,7 @@
 #include "drawmap.h"
 
-void drawMap(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vector<tile*>> &tiles)
+
+void drawMap(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vector<tile*>> &tiles, std::list<unit*>& units)
 {
 	SDL_Rect drawRect;
 	drawRect.h = tilesize;
@@ -14,6 +15,7 @@ void drawMap(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vecto
 			drawRect.x = i * tilesize;
 			drawRect.y = j * tilesize;
 			SDL_FillRect(winSurface, &drawRect, tiles[j][i]->getColor(*winSurface));
+			/* Debug, render openclosed
 			if (tiles[j][i]->openclosed == 0)
 			{
 				drawRect.h -= 10;
@@ -34,6 +36,21 @@ void drawMap(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vecto
 				drawRect.h = tilesize;
 				drawRect.w = tilesize;
 			}
+			*/
+			 // Render units
+			for (auto unit : units)
+			{
+				if (unit->tileAt_->x_ == i && unit->tileAt_->y_ == j)
+				{
+					drawRect.h -= 10;
+					drawRect.w -= 10;
+					drawRect.x += 5;
+					drawRect.y += 5;
+					SDL_FillRect(winSurface, &drawRect, SDL_MapRGB(winSurface->format, 255, 0, 255));
+					drawRect.h = tilesize;
+					drawRect.w = tilesize;
+				}
+			}
 		}
 	}
 	SDL_UpdateWindowSurface(window);
@@ -46,6 +63,7 @@ void initMap(std::vector<std::vector<tile*>> &tiles, bool skiptarg, bool skipsta
 	std::string buffer;
 	while (getline(map, buffer))
 	{
+		std::cout << "reading line..." << std::endl;
 		std::cout << buffer << std::endl;
 		std::vector<tile*> row;
 		row.clear();
@@ -67,8 +85,8 @@ void initMap(std::vector<std::vector<tile*>> &tiles, bool skiptarg, bool skipsta
 			tiles[i][j]->y_ = i;
 		}
 	}
-	std::cout << "read map with height" << tiles.size() << std::endl;
-	std::cout << "read map with width "<< std::endl;
+	std::cout << "read map with height " << tiles.size() << std::endl;
+	std::cout << "read map with width "<< tiles[0].size() << std::endl;
 }
 std::vector<int> getNode(std::vector<std::vector<tile*>>& tiles, int state)
 {

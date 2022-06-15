@@ -1,13 +1,14 @@
 #include "astar.h"
 
-std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vector<tile*>> &tiles)
+std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vector<tile*>> &tiles, tile* start, tile* finish)
 {
 	// Initialization
 	std::list<tile*> open;
 	std::list<tile*> closed;
-	tile* current = NULL;
-	tile* goal = NULL;
-	tile* begin = NULL;
+	tile* current = start;
+	tile* goal = finish;
+	tile* begin = start;
+	/*
 	for (int i = 0; i < tiles.size(); i++)
 	{
 		for (int j = 0; j < tiles[0].size(); j++)
@@ -36,6 +37,7 @@ std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vecto
 		system("pause");
 		exit(1);
 	}
+	*/
 	// Begin algorithm
 	// calculate start point f,g,h
 	current->h_=current->distTo(goal);
@@ -69,8 +71,6 @@ std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vecto
 		std::list<tile*> successors;
 		int maph = tiles.size();
 		int mapw = tiles[0].size();
-		std::cout << "Map height is " << maph << std::endl;
-		std::cout << "Map width is " << mapw << std::endl;
 
 		for (int i = -1; i <= 1; i++)
 		{
@@ -89,7 +89,6 @@ std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vecto
 				if (tiles[ni][nj]->state_ == 1) continue;
 
 				successors.push_back(tiles[ni][nj]);
-				std::cout << "Found " << successors.size() << " neighbors" << std::endl;
 			}
 		}
 		// compute successor f,g,h and open/closed
@@ -127,6 +126,10 @@ std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vecto
 		{
 			tile->openclosed = 1;
 		}
+		/*
+		// Render piecewise
+		drawMap(winSurface, window, tiles);
+		*/
 	}
 	std::cout << "Error: Open list became empty" << std::endl;
 	system("pause");
