@@ -1,5 +1,5 @@
 #include "drawmap.h"
-
+#include "player.h"
 
 void drawMap(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vector<tile*>> &tiles, std::list<unit*>& units)
 {
@@ -37,7 +37,10 @@ void drawMap(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vecto
 				drawRect.w = tilesize;
 			}
 			*/
-			 // Render units
+
+			// Render units
+			// Optimization note: This searches every single unit for every single tile (redundant)
+			// Optimize by having each tile know whether or not there's a unit on it, and checking that and the corresponding unit
 			for (auto unit : units)
 			{
 				if (unit->tileAt_->x_ == i && unit->tileAt_->y_ == j)
@@ -46,7 +49,7 @@ void drawMap(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vecto
 					drawRect.w -= 10;
 					drawRect.x += 5;
 					drawRect.y += 5;
-					SDL_FillRect(winSurface, &drawRect, SDL_MapRGB(winSurface->format, 255, 0, 255));
+					SDL_FillRect(winSurface, &drawRect, unit->team_->color_);
 					drawRect.h = tilesize;
 					drawRect.w = tilesize;
 				}

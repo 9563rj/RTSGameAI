@@ -68,8 +68,11 @@ int main(int argc, char** args)
 		}
 	}
 	std::list<unit*> units;
-	unit hero(tiles, 0, startr, startc, window, winSurface);
-	units.push_back(&hero);
+	// player p1(0, *winSurface);
+	std::vector<player*> players;
+	// players.push_back(&p1);
+	// unit hero(players.back(), tiles, 0, startr, startc, window, winSurface);
+	// units.push_back(&hero);
 	// Draw initialized map
 	drawMap(winSurface, window, tiles, units);
 
@@ -78,11 +81,9 @@ int main(int argc, char** args)
 	SDL_Event event;
 	
 	// Create unit, initialize, create path variable
-	player p1(0, &hero, *winSurface);
-	std::vector<player*> players;
-	players.push_back(&p1);
+	
 	std::vector<tile*> path;
-	unit* currentunit = &hero;
+	unit* currentunit = NULL;
 	while (gameRunning)
 	{
 		SDL_PollEvent(&event);
@@ -101,12 +102,25 @@ int main(int argc, char** args)
 			case(SDL_MOUSEBUTTONUP):
 				if (event.button.button == SDL_BUTTON_LEFT)
 				{
+					// On left click, tell player to move to clicked tile
 					int mousex;
 					int mousey;
 					SDL_GetMouseState(&mousex, &mousey);
 					int row = mousey / tilesize;
 					int column = mousex / tilesize;
 					bool cont = true;
+					if (currentunit == NULL)
+					{
+						int mousex;
+						int mousey;
+						SDL_GetMouseState(&mousex, &mousey);
+						int row = mousey / tilesize;
+						int column = mousex / tilesize;
+						players.push_back(new player(players.size(), *winSurface));
+						units.push_back(new unit(players.back(), tiles, 0, row, column, window, winSurface));
+						players.back()->commander_ = units.back();
+						players.back()->units_.push_back(units.back());
+					}
 					for (auto unit : units)
 					{
 						if (unit->tileAt_->y_ == row && unit->tileAt_->x_ == column)
@@ -130,19 +144,31 @@ int main(int argc, char** args)
 							}
 							std::cout << "setting new goal to r=" << row << " and c=" << column << std::endl;
 							// tiles[row][column]->state_ = 3;
-							currentunit->navigate(tiles, tiles[row][column], winSurface, window);
+							currentunit->navigate(tiles, units, tiles[row][column], winSurface, window);
 						}
 					}
 				}
 				else if (event.button.button == SDL_BUTTON_RIGHT)
 				{
+					// On right click, create new player at tile
 					int mousex;
 					int mousey;
 					SDL_GetMouseState(&mousex, &mousey);
 					int row = mousey / tilesize;
 					int column = mousex / tilesize;
-					units.push_back(new unit(tiles, 0, row, column, window, winSurface));
-					players.push_back(new player(players.size(), units.back(), *winSurface));
+					int playerlimit = 21;
+					if (players.size() < playerlimit)
+					{
+						players.push_back(new player(players.size(), *winSurface));
+						units.push_back(new unit(players.back(), tiles, 0, row, column, window, winSurface));
+					}
+					else
+					{
+						std::cout << "Exceeded player limit, which is " << playerlimit << std::endl;
+						std::system("pause");
+					}
+					players.back()->commander_ = units.back();
+					players.back()->units_.push_back(units.back());
 				}
 				break;
 		}

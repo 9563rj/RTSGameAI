@@ -1,11 +1,12 @@
 #include "unit.h"
-unit::unit(const std::vector<std::vector<tile*>>& tiles, const int type, const int row, const int column, SDL_Window* window, SDL_Surface* winSurface)
+unit::unit(player* team, const std::vector<std::vector<tile*>>& tiles, const int type, const int row, const int column, SDL_Window* window, SDL_Surface* winSurface)
 {
 	tileAt_ = tiles[row][column];
 	type_ = type;
 	window_ = window;
 	surface_ = winSurface;
 	path_.clear();
+	team_ = team;
 }
 
 void unit::advance(std::vector<std::vector<tile*>>& tiles)
@@ -23,10 +24,10 @@ void unit::advance(std::vector<std::vector<tile*>>& tiles)
 	}
 }
 
-void unit::navigate(std::vector<std::vector<tile*>>& tiles, tile* goal, SDL_Surface* winSurface, SDL_Window* window)
+void unit::navigate(std::vector<std::vector<tile*>>& tiles, std::list<unit*>& units, tile* goal, SDL_Surface* winSurface, SDL_Window* window)
 {
 	std::vector<tile*> vectorpath;
-	vectorpath = astar(winSurface, window, tiles, tileAt_, goal);
+	vectorpath = astar(winSurface, window, tiles, units, tileAt_, goal);
 	path_.clear();
 	for (int i = 0; i < vectorpath.size(); i++)
 	{

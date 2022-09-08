@@ -1,6 +1,6 @@
 #include "astar.h"
 
-std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vector<tile*>> &tiles, tile* start, tile* finish)
+std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vector<tile*>>& tiles, std::list<unit*>& units, tile* start, tile* finish)
 {
 	// Initialization
 	std::list<tile*> open;
@@ -87,8 +87,17 @@ std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vecto
 				if (ni >= maph) continue;
 				if (nj >= mapw) continue;
 				if (tiles[ni][nj]->state_ == 1) continue;
+				for (auto unit : units)
+				{
+					if (unit->tileAt_->x_ == nj && unit->tileAt_->y_ == ni)
+					{
+						goto BREAK_LOOPS;
+					}
 
+				}
 				successors.push_back(tiles[ni][nj]);
+			BREAK_LOOPS:
+				continue;
 			}
 		}
 		// compute successor f,g,h and open/closed
