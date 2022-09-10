@@ -3,6 +3,10 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# SDL ignore
+SDL2-2.0.22
+SDL2-2.24.0
+
 # User-specific files
 *.rsuser
 *.suo

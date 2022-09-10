@@ -75,12 +75,12 @@
     <LibraryPath>C:\Users\kapri\source\repos\RTSGame\SDL2-2.0.22\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\kapri\source\repos\RTSGame\SDL2-2.0.22\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\kapri\source\repos\RTSGame\SDL2-2.0.22\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\kapri\source\repos\RTSGame\SDL2-2.24.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\kapri\source\repos\RTSGame\SDL2-2.24.0\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Users\kapri\source\repos\RTSGame\SDL2-2.0.22\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\kapri\source\repos\RTSGame\SDL2-2.0.22\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\kapri\source\repos\RTSGame\SDL2-2.24.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\kapri\source\repos\RTSGame\SDL2-2.24.0\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
