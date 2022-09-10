@@ -4,8 +4,10 @@ struct player;
 struct unit;
 struct tile
 {
-	tile(const int& state);
+	tile(const int& state, int& x, int& y);
 	int state_;
+	int factoryType; // corresponds to unit types, except 0 is not a factory
+	void spawnUnit(const std::vector<std::vector<tile*>>& tiles, std::list<unit*>& units, SDL_Window* window, SDL_Surface* winSurface);
 	/*States
 	0 = Open
 	1 = Wall

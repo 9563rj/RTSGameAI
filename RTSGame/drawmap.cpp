@@ -85,6 +85,8 @@ void initMap(std::vector<std::vector<tile*>> &tiles, bool skiptarg, bool skipsta
 	tiles.clear();
 	std::ifstream map("map.txt");
 	std::string buffer;
+	int column = 0;
+	int rowIndex = 0;
 	while (getline(map, buffer))
 	{
 		std::cout << "reading line..." << std::endl;
@@ -96,9 +98,12 @@ void initMap(std::vector<std::vector<tile*>> &tiles, bool skiptarg, bool skipsta
 			int state = ch - '0';
 			// if (skiptarg && state == 3) { state = 0; }	deprecated
 			// if (skipstart && state == 2) { state = 0; }	deprecated
-			row.push_back(new tile(state));
+			row.push_back(new tile(state, column, rowIndex));
+			column++;
 		}
 		tiles.push_back(row);
+		column = 0;
+		rowIndex++;
 	}
 
 	for (int i = 0; i < tiles.size(); i++)

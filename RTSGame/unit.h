@@ -1,7 +1,7 @@
 #pragma once
 #include "main.h"
 #include "astar.h"
-#include "tile.h"
+struct tile;
 struct player;
 struct unit // Parallel definitions in unit.h and tile.cpp
 {

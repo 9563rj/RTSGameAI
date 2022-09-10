@@ -1,11 +1,13 @@
 #pragma once
 #include "unit.h"
+#include "tile.h"
 
 struct player // Parallel definitions in unit.cpp, tile.cpp, player.h
 {
 	player(int team, SDL_Surface& winSurface);
 	Uint32 teamColor(int team, SDL_Surface& winSurface);
 	int resources_;
+	int maxResources_;
 	Uint32 color_;
 	unit* commander_;
 	std::list<unit*> units_;
@@ -34,7 +36,7 @@ void unit::advance(std::vector<std::vector<tile*>>& tiles)
 		SDL_Delay(75);
 		// tileAt_->state_ = 2;
 	}
-	else if (tileAt_->state_ == 2 && resourceMineFlag)
+	else if (tileAt_->state_ == 2 && resourceMineFlag && team_->resources_ < team_->maxResources_ && type_ == 3)
 	{
 		team_->resources_++;
 		resourceMineFlag = false;

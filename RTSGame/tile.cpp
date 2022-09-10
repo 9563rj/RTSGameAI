@@ -1,3 +1,4 @@
+#include "unit.h"
 #include "tile.h"
 
 struct player // Parallel definitions in unit.cpp, tile.cpp, player.h
@@ -11,33 +12,65 @@ struct player // Parallel definitions in unit.cpp, tile.cpp, player.h
 	std::list<unit*> units_;
 };
 
-struct unit // Parallel definitions in unit.h and tile.cpp
-{
-	unit(player* team, const std::vector<std::vector<tile*>>& tiles, const int type, const int row, const int column, SDL_Window* window, SDL_Surface* winSurface);
-	void advance(std::vector<std::vector<tile*>>& tiles);
-	void navigate(std::vector<std::vector<tile*>>& tiles, std::list<unit*>& units, tile* goal, SDL_Surface* winSurface, SDL_Window* window);
-	bool resourceMineFlag; // whether or not resourceMineRate amount of ms has passed since last resource mined
-	int type_;
-	/* Unit Types
-	0 = Main Unit
-	1 = Fighter
-	2 = Builder
-	3 = Miner
-	*/
-	void claimTile();
-	SDL_Window* window_;
-	SDL_Surface* surface_;
-	tile* tileAt_;
-	std::list<tile*> path_;
-	player* team_;
-};
-
-tile::tile(const int& state)
+tile::tile(const int& state, int& x, int& y)
 {
 	state_ = state;
 	openclosed = 2;
 	onpath = false;
 	claimedBy_ = NULL;
+	factoryType = 0;
+	x_ = x;
+	y_ = y;
+}
+void tile::spawnUnit(const std::vector<std::vector<tile*>>& tiles, std::list<unit*>& units, SDL_Window* window, SDL_Surface* winSurface)
+{
+	if (claimedBy_->resources_ > 9)
+	{
+		bool noUnitUp = true;
+		bool noUnitLeft = true;
+		bool noUnitRight = true;
+		bool noUnitDown = true;
+
+		for (auto unitPtr : units)
+		{
+			int unitX = unitPtr->tileAt_->x_;
+			int unitY = unitPtr->tileAt_->y_;
+			if (unitX == x_ && unitY == y_ - 1) noUnitUp = false;
+			if (unitX == x_ - 1 && unitY == y_) noUnitLeft = false;
+			if (unitX == x_ + 1 && unitY == y_) noUnitRight = false;
+			if (unitX == x_ && unitY == y_ + 1) noUnitDown = false;
+		}
+
+		if (noUnitUp)
+		{
+			units.push_back(new unit(claimedBy_, tiles, factoryType, y_ - 1, x_, window, winSurface));
+			claimedBy_->units_.push_back(units.back());
+		}
+		else if (noUnitLeft)
+		{
+			units.push_back(new unit(claimedBy_, tiles, factoryType, y_, x_ - 1, window, winSurface));
+			claimedBy_->units_.push_back(units.back());
+		}
+		else if (noUnitRight)
+		{
+			units.push_back(new unit(claimedBy_, tiles, factoryType, y_, x_ + 1, window, winSurface));
+			claimedBy_->units_.push_back(units.back());
+		}
+		else if (noUnitDown)
+		{
+			units.push_back(new unit(claimedBy_, tiles, factoryType, y_ + 1, x_, window, winSurface));
+			claimedBy_->units_.push_back(units.back());
+		}
+		else
+		{
+			std::cout << "Warning: factory at " << x_ << ", " << y_ << " is surrounded, no unit produced this cycle" << std::endl;
+		}
+		claimedBy_->resources_ -= 10;
+	}
+	else
+	{
+		std::cout << "Not enough resources to produce a unit from factory at " << x_ << ", " << y_ << std::endl;
+	}
 }
 /*States
 0 = Open
@@ -45,6 +78,7 @@ tile::tile(const int& state)
 2 = Resource
 3 = Factory
 */
+
 
 int tile::distTo(tile* dest)
 {
@@ -95,3 +129,4 @@ Uint32 tile::getColor(SDL_Surface& winSurface)
 			break;
 	}
 }
+
