@@ -314,6 +314,7 @@ int main(int argc, char** args)
 
 		// Cycle through every unit, compute combat, mining, and moving
 		std::list<unit*> deadUnits;
+		std::list<tile*> deadFactories;
 		for(auto unitPtr : units)
 		{
 			if (unitMoveTimerDone) unitPtr->unitMoveFlag = true;
@@ -335,6 +336,32 @@ int main(int argc, char** args)
 						targetPtr->health_ -= 1;
 						bool alreadyDeadCheck = deadUnits.end() == std::find(deadUnits.begin(), deadUnits.end(), targetPtr);
 						if (targetPtr->health_ < 1 && alreadyDeadCheck) deadUnits.push_back(targetPtr);
+					}
+				}
+				//for (auto targetPtr : factories)
+				for(std::list<tile*>::iterator it = factories.begin(); it != factories.end(); it++)
+				{
+					tile* targetPtr = *it;
+					int targetX = targetPtr->x_;
+					int targetY = targetPtr->y_;
+					int selfX = unitPtr->tileAt_->x_;
+					int selfY = unitPtr->tileAt_->y_;
+
+					bool above = (targetX == selfX && targetY == selfY - 1);
+					bool left = (targetX == selfX - 1 && targetY == selfY);
+					bool right = (targetX == selfX + 1 && targetY == selfY);
+					bool below = (targetX == selfX && targetY == selfY + 1);
+					if ((above || left || right || below) && (targetPtr->claimedBy_ != unitPtr->team_))
+					{
+						bool alreadyDeadCheck = deadFactories.end() == std::find(deadFactories.begin(), deadFactories.end(), targetPtr);
+						if (alreadyDeadCheck)
+						{
+							targetPtr->claimedBy_ = NULL;
+							targetPtr->factoryType = 0;
+							targetPtr->state_ = 0;
+							it = factories.erase(std::find(factories.begin(), factories.end(), targetPtr));
+							if (it == factories.end()) break;
+						}
 					}
 				}
 			}
@@ -359,6 +386,44 @@ int main(int argc, char** args)
 			units.erase(std::find(units.begin(), units.end(), deadPtr));
 			deadPtr->tileAt_->unitAt_ = NULL; // "corpse" removed from tile
 			delete deadPtr;
+		}
+
+
+		// Win conditions: if player has no factories or units, it is a dead player, and if only one player left and has units and factories, that player wins
+		std::list<player*> deadPlayers;
+		for (auto playerPtr : players)
+		{
+			bool hasNoFactories = true;
+			for (auto factoryPtr : factories)
+			{
+				if (factoryPtr->claimedBy_ == playerPtr) hasNoFactories = false;
+			}
+			if (playerPtr->units_.size() == 0 && hasNoFactories)
+			{
+				deadPlayers.push_back(playerPtr);
+			}
+		}
+		for (auto playerPtr : deadPlayers)
+		{
+			players.erase(std::find(players.begin(), players.end(), playerPtr));
+			delete playerPtr;
+		}
+		if (players.size() == 1)
+		{
+			for (auto playerPtr : players)
+			{
+				bool hasNoFactories = true;
+				for (auto factoryPtr : factories)
+				{
+					if (factoryPtr->claimedBy_ == playerPtr) hasNoFactories = false;
+				}
+				if (playerPtr->units_.size() != 0 && !hasNoFactories)
+				{
+					std::cout << "Player with color " << playerPtr->color_ << " wins!" << std::endl;
+					std::system("pause");
+					gameRunning = false;
+				}
+			}
 		}
 
 		drawMap(winSurface, window, tiles, units, players);
