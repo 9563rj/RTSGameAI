@@ -4,102 +4,11 @@
 #include "tile.h"
 #include "unit.h"
 #include "player.h"
+#include "buildfactory.h"
 
 const int tilesize = 25;
 
-void buildFactory(std::list<unit*>& units, std::vector<std::vector<tile*>>& tiles, std::list<tile*>& factories, unit* currentunit, SDL_Surface* winSurface, SDL_Window* window, int factoryTypeSelector)
-{
-	int mousex;
-	int mousey;
-	SDL_GetMouseState(&mousex, &mousey);
-	int row = mousey / tilesize;
-	int column = mousex / tilesize;
-	if (units.size() > 0)
-	{
-		/*std::cout << "There are " << units.size() << " units." << std::endl;
-		std::list<unit*>::iterator it;
-		for (it = units.begin(); it != units.end(); it++)
-		{
-			std::cout << "unit pointer is " << *it << std::endl;
-			std::system("pause");
-		}
-		*/
 
-		// Create copy of units to avoid modifying a currently iterated list
-		std::list<unit*> unitsCopy = units;
-		for (auto unitPtr : unitsCopy)
-		{
-			bool aboveClear = true;
-			bool leftClear = true;
-			bool rightClear = true;
-			bool belowClear = true;
-			if (tiles[unitPtr->tileAt_->y_ - 1][unitPtr->tileAt_->x_]->state_ == 3) aboveClear = false;
-			if (tiles[unitPtr->tileAt_->y_][unitPtr->tileAt_->x_ - 1]->state_ == 3) leftClear = false;
-			if (tiles[unitPtr->tileAt_->y_][unitPtr->tileAt_->x_ + 1]->state_ == 3) rightClear = false;
-			if (tiles[unitPtr->tileAt_->y_ + 1][unitPtr->tileAt_->x_]->state_ == 3) belowClear = false;
-			if (aboveClear && leftClear && rightClear && belowClear)
-			{
-				// If main unit, also spawn Fighter, Builder, Miner
-				if (unitPtr->type_ == 0)
-				{
-					if (unitPtr->tileAt_ == tiles[row][column] && (unitPtr->type_ == 0 || unitPtr->type_ == 2) && unitPtr->tileAt_->state_ == 0)
-					{
-						if (currentunit == unitPtr) currentunit = NULL;
-
-						// Set this tile to be a factory tile and add it to the list of factory tiles
-						unitPtr->tileAt_->claimedBy_ = unitPtr->team_;
-						unitPtr->tileAt_->state_ = 3;
-						unitPtr->tileAt_->factoryType = factoryTypeSelector;
-						factories.push_back(unitPtr->tileAt_);
-
-						// Create fighter, builder, and miner and add to relevant lists
-						units.push_back(new unit(unitPtr->team_, tiles, 1, row - 1, column, window, winSurface));
-						unitPtr->team_->units_.push_back(units.back());
-						units.push_back(new unit(unitPtr->team_, tiles, 2, row, column + 1, window, winSurface));
-						unitPtr->team_->units_.push_back(units.back());
-						units.push_back(new unit(unitPtr->team_, tiles, 3, row + 1, column, window, winSurface));
-						unitPtr->team_->units_.push_back(units.back());
-
-						// Erase from list of units held by this unit's team
-						std::list<unit*>& teamUnitList = unitPtr->team_->units_;
-						teamUnitList.erase(std::find(teamUnitList.begin(), teamUnitList.end(), unitPtr));
-
-						// Erase from global list of units
-						units.erase(std::find(units.begin(), units.end(), unitPtr));
-
-						unitPtr->tileAt_->unitAt_ = NULL; // "corpse" removed from tile
-
-						delete unitPtr;
-					}
-				}
-				else if (unitPtr->type_ == 2)
-				{
-					if (unitPtr->tileAt_ == tiles[row][column] && (unitPtr->type_ == 0 || unitPtr->type_ == 2) && unitPtr->tileAt_->state_ == 0)
-					{
-						if (currentunit == unitPtr) currentunit = NULL;
-
-						// Set this tile to be a factory tile and add it to the list of factory tiles
-						unitPtr->tileAt_->claimedBy_ = unitPtr->team_;
-						unitPtr->tileAt_->state_ = 3;
-						unitPtr->tileAt_->factoryType = factoryTypeSelector;
-						factories.push_back(unitPtr->tileAt_);
-
-						// Erase from list of units held by this unit's team
-						std::list<unit*>& teamUnitList = unitPtr->team_->units_;
-						teamUnitList.erase(std::find(teamUnitList.begin(), teamUnitList.end(), unitPtr));
-
-						// Erase from global list of units
-						units.erase(std::find(units.begin(), units.end(), unitPtr));
-
-						unitPtr->tileAt_->unitAt_ = NULL; // "corpse" removed from tile
-
-						delete unitPtr;
-					}
-				}
-			}
-		}
-	}
-}
 
 int main(int argc, char** args)
 {
@@ -194,6 +103,10 @@ int main(int argc, char** args)
 	int unitMoveInterval = 75;
 	Uint64 unitMoveTimer = SDL_GetTicks64() % unitMoveInterval;
 
+	// Init AI acting timer
+	int aiActInterval = 1000;
+	Uint64 aiActTimer = SDL_GetTicks64() % aiActInterval;
+
 	int playerlimit = 15;
 
 	// Main game loop
@@ -219,14 +132,35 @@ int main(int argc, char** args)
 						}
 						break;
 					case(SDLK_f):
-						buildFactory(units, tiles, factories, currentunit, winSurface, window, 1);
+					{
+						int mousex;
+						int mousey;
+						SDL_GetMouseState(&mousex, &mousey);
+						int row = mousey / tilesize;
+						int column = mousex / tilesize;
+						buildFactory(row, column, units, tiles, factories, currentunit, winSurface, window, 1);
 						break;
+					}
 					case(SDLK_b):
-						buildFactory(units, tiles, factories, currentunit, winSurface, window, 2);
+					{
+						int mousex;
+						int mousey;
+						SDL_GetMouseState(&mousex, &mousey);
+						int row = mousey / tilesize;
+						int column = mousex / tilesize;
+						buildFactory(row, column, units, tiles, factories, currentunit, winSurface, window, 2);
 						break;
+					}
 					case(SDLK_m):
-						buildFactory(units, tiles, factories, currentunit, winSurface, window, 3);
+					{
+						int mousex;
+						int mousey;
+						SDL_GetMouseState(&mousex, &mousey);
+						int row = mousey / tilesize;
+						int column = mousex / tilesize;
+						buildFactory(row, column, units, tiles, factories, currentunit, winSurface, window, 3);
 						break;
+					}
 				}
 			case(SDL_MOUSEBUTTONUP):
 				if (event.button.button == SDL_BUTTON_LEFT)
@@ -253,7 +187,7 @@ int main(int argc, char** args)
 					}
 					for (auto unit : units)
 					{
-						if (unit->tileAt_->y_ == row && unit->tileAt_->x_ == column)
+						if (unit->tileAt_->y_ == row && unit->tileAt_->x_ == column && unit->team_->human_)
 						{
 							currentunit = unit;
 							cont = false;
@@ -286,9 +220,16 @@ int main(int argc, char** args)
 					SDL_GetMouseState(&mousex, &mousey);
 					int row = mousey / tilesize;
 					int column = mousex / tilesize;
-					if (players.size() < playerlimit)
+					if (players.size() == 0)
 					{
-						players.push_back(new player(players.size(), *winSurface));
+						std::cout << "Creating human player" << std::endl;
+						players.push_back(new player(players.size(), *winSurface, true));
+						units.push_back(new unit(players.back(), tiles, 0, row, column, window, winSurface));
+					}
+					else if (players.size() < playerlimit)
+					{
+						std::cout << "Creating AI player" << std::endl;
+						players.push_back(new player(players.size(), *winSurface, false));
 						units.push_back(new unit(players.back(), tiles, 0, row, column, window, winSurface));
 					}
 					else
@@ -346,6 +287,29 @@ int main(int argc, char** args)
 		else
 		{
 			unitMoveTimer = SDL_GetTicks64() % unitMoveInterval;
+		}
+
+		bool aiActTimerDone = false;
+		if (aiActTimer > SDL_GetTicks64() % aiActInterval)
+		{
+			aiActTimerDone = true;
+			aiActTimer = SDL_GetTicks64() % aiActInterval;
+		}
+		else
+		{
+			aiActTimer = SDL_GetTicks64() % aiActInterval;
+		}
+
+		// Cycle through every player, tell non-humans to perform AI actions
+		if (aiActTimerDone)
+		{
+			for (auto playerPtr : players)
+			{
+				if (!playerPtr->human_)
+				{
+					playerPtr->act(units, factories, tiles, winSurface, window);
+				}
+			}
 		}
 
 		// Cycle through every unit, compute combat, mining, and moving

@@ -97,11 +97,7 @@ void player::act(std::list<unit*>& units, std::list<tile*>& factories, std::vect
 			double columnPicker = rand() / double(RAND_MAX);
 			int row = rowPicker * tiles.size();
 			int column = columnPicker * tiles[0].size();
-			if (it == units_.end())
-			{
-				std::cout << "Player with pointer " << this << " attempted to move a unit, but has no units left" << std::endl;
-			}
-			else (*it)->navigate(tiles, units, tiles[row][column], winSurface, window);
+			(*it)->navigate(tiles, units, tiles[row][column], winSurface, window);
 		}
 		else if (r >= .8)
 		{
