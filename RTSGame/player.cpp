@@ -151,7 +151,7 @@ void player::act(std::list<unit*>& units, std::list<tile*>& factories, std::vect
 					double factoryTypePicker = rand() / double(RAND_MAX);
 					int factoryTypeSelector = factoryTypePicker * 3 + 1;
 					//std::cout << "Attempting to build factory of type " << factoryTypeSelector << " at " << unitPtr->tileAt_->x_ << ", " << unitPtr->tileAt_->y_ << std::endl;
-					buildFactory(unitPtr->tileAt_->y_, unitPtr->tileAt_->x_, units, tiles, factories, unitPtr, winSurface, window, factoryTypeSelector);
+					unitPtr->buildFactory(units, tiles, factories, winSurface, window, factoryTypeSelector);
 					break;
 				}
 				

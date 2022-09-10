@@ -1,6 +1,7 @@
 #include "unit.h"
 #include "tile.h"
 #include "player.h"
+#include "utils.h"
 
 tile::tile(const int& state, int& x, int& y)
 {
@@ -18,40 +19,41 @@ void tile::spawnUnit(const std::vector<std::vector<tile*>>& tiles, std::list<uni
 {
 	if (claimedBy_->resources_ > 9)
 	{
-		bool noUnitUp = true;
-		bool noUnitLeft = true;
-		bool noUnitRight = true;
-		bool noUnitDown = true;
+		bool validSpawnUp = true;
+		bool validSpawnLeft = true;
+		bool validSpawnRight = true;
+		bool validSpawnDown = true;
 
-		for (auto unitPtr : units)
-		{
-			int unitX = unitPtr->tileAt_->x_;
-			int unitY = unitPtr->tileAt_->y_;
-			if (unitX == x_ && unitY == y_ - 1) noUnitUp = false;
-			if (unitX == x_ - 1 && unitY == y_) noUnitLeft = false;
-			if (unitX == x_ + 1 && unitY == y_) noUnitRight = false;
-			if (unitX == x_ && unitY == y_ + 1) noUnitDown = false;
-		}
+		// Make sure factories are never directly against map border past boundary walls!
+		tile* aboveTile = tiles[y_ - 1][x_];
+		tile* leftTile = tiles[y_][x_ - 1];
+		tile* rightTile = tiles[y_][x_ + 1];
+		tile* belowTile = tiles[y_ + 1][x_];
 
-		if (noUnitUp)
+		if (aboveTile->unitAt_ != NULL || aboveTile->state_ == 1) validSpawnUp = false;
+		if (leftTile->unitAt_ != NULL || leftTile->state_ == 1) validSpawnLeft = false;
+		if (rightTile->unitAt_ != NULL || rightTile->state_ == 1) validSpawnRight = false;
+		if (belowTile->unitAt_ != NULL || belowTile->state_ == 1) validSpawnDown = false;
+
+		if (validSpawnUp)
 		{
 			claimedBy_->resources_ -= 10;
 			units.push_back(new unit(claimedBy_, tiles, factoryType, y_ - 1, x_, window, winSurface));
 			claimedBy_->units_.push_back(units.back());
 		}
-		else if (noUnitLeft)
+		else if (validSpawnLeft)
 		{
 			claimedBy_->resources_ -= 10;
 			units.push_back(new unit(claimedBy_, tiles, factoryType, y_, x_ - 1, window, winSurface));
 			claimedBy_->units_.push_back(units.back());
 		}
-		else if (noUnitRight)
+		else if (validSpawnRight)
 		{
 			claimedBy_->resources_ -= 10;
 			units.push_back(new unit(claimedBy_, tiles, factoryType, y_, x_ + 1, window, winSurface));
 			claimedBy_->units_.push_back(units.back());
 		}
-		else if (noUnitDown)
+		else if (validSpawnDown)
 		{
 			claimedBy_->resources_ -= 10;
 			units.push_back(new unit(claimedBy_, tiles, factoryType, y_ + 1, x_, window, winSurface));
@@ -59,7 +61,7 @@ void tile::spawnUnit(const std::vector<std::vector<tile*>>& tiles, std::list<uni
 		}
 		else
 		{
-			std::cout << "Warning: factory at " << x_ << ", " << y_ << " is surrounded, no unit produced this cycle" << std::endl;
+			//std::cout << "Warning: factory at " << x_ << ", " << y_ << " is surrounded, no unit produced this cycle" << std::endl;
 		}
 		
 	}

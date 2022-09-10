@@ -150,8 +150,8 @@ void initMap(std::vector<std::vector<tile*>> &tiles, bool skiptarg, bool skipsta
 	int rowIndex = 0;
 	while (getline(map, buffer))
 	{
-		std::cout << "reading line..." << std::endl;
-		std::cout << buffer << std::endl;
+		//std::cout << "reading line..." << std::endl;
+		//std::cout << buffer << std::endl;
 		std::vector<tile*> row;
 		row.clear();
 		for (char ch : buffer)
@@ -175,8 +175,8 @@ void initMap(std::vector<std::vector<tile*>> &tiles, bool skiptarg, bool skipsta
 			tiles[i][j]->y_ = i;
 		}
 	}
-	std::cout << "read map with height " << tiles.size() << std::endl;
-	std::cout << "read map with width "<< tiles[0].size() << std::endl;
+	//std::cout << "read map with height " << tiles.size() << std::endl;
+	//std::cout << "read map with width "<< tiles[0].size() << std::endl;
 }
 std::vector<int> getNode(std::vector<std::vector<tile*>>& tiles, int state)
 {

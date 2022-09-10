@@ -44,11 +44,11 @@ int main(int argc, char** args)
 	initMap(tiles, false, false);
 	// std::cout << "map has height " << tiles.size() << std::endl;
 	// std::cout << "map has width " << tiles[0].size() << std::endl;
-	for (auto row : tiles) {
+	/*for (auto row : tiles) {
 		for (auto tile : row) {
 			printf("(%d,%d)", tile->y_, tile->x_);
 		}
-	}
+	}*/
 	// init units up here to draw
 	int targr;
 	int targc;
@@ -138,7 +138,7 @@ int main(int argc, char** args)
 						SDL_GetMouseState(&mousex, &mousey);
 						int row = mousey / tilesize;
 						int column = mousex / tilesize;
-						buildFactory(row, column, units, tiles, factories, currentunit, winSurface, window, 1);
+						if(currentunit != NULL) currentunit->buildFactory(units, tiles, factories, winSurface, window, 1);
 						break;
 					}
 					case(SDLK_b):
@@ -148,7 +148,7 @@ int main(int argc, char** args)
 						SDL_GetMouseState(&mousex, &mousey);
 						int row = mousey / tilesize;
 						int column = mousex / tilesize;
-						buildFactory(row, column, units, tiles, factories, currentunit, winSurface, window, 2);
+						if (currentunit != NULL) currentunit->buildFactory(units, tiles, factories, winSurface, window, 2);
 						break;
 					}
 					case(SDLK_m):
@@ -158,7 +158,7 @@ int main(int argc, char** args)
 						SDL_GetMouseState(&mousex, &mousey);
 						int row = mousey / tilesize;
 						int column = mousex / tilesize;
-						buildFactory(row, column, units, tiles, factories, currentunit, winSurface, window, 3);
+						if (currentunit != NULL) currentunit->buildFactory(units, tiles, factories, winSurface, window, 3);
 						break;
 					}
 				}
@@ -230,6 +230,7 @@ int main(int argc, char** args)
 						// std::cout << "Creating human player" << std::endl;
 						players.push_back(new player(players.size(), *winSurface, true));
 						units.push_back(new unit(players.back(), tiles, 0, row, column, window, winSurface));
+						currentunit = units.back();
 					}
 					else if (players.size() < playerlimit)
 					{

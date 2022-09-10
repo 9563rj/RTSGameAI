@@ -149,11 +149,13 @@
     <ClCompile Include="player.cpp" />
     <ClCompile Include="tile.cpp" />
     <ClCompile Include="unit.cpp" />
+    <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="astar.h" />
     <ClInclude Include="buildfactory.h" />
     <ClInclude Include="drawmap.h" />
+    <ClInclude Include="utils.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="tile.h" />
