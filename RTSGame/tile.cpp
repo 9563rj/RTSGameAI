@@ -65,7 +65,7 @@ void tile::spawnUnit(const std::vector<std::vector<tile*>>& tiles, std::list<uni
 	}
 	else
 	{
-		std::cout << "Not enough resources to produce a unit from factory at " << x_ << ", " << y_ << std::endl;
+		//std::cout << "Not enough resources to produce a unit from factory at " << x_ << ", " << y_ << std::endl;
 	}
 }
 /*States

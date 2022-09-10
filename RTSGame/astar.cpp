@@ -145,7 +145,7 @@ std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vecto
 		drawMap(winSurface, window, tiles);
 		*/
 	}
-	std::cout << "Error: Open list became empty, could not find path" << std::endl;
+	//std::cout << "Error: Open list became empty, could not find path" << std::endl;
 	return empty;
 
 	// system("pause");

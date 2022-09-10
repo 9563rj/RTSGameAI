@@ -42,8 +42,8 @@ int main(int argc, char** args)
 	// Map init
 	std::vector<std::vector<tile*>> tiles;
 	initMap(tiles, false, false);
-	std::cout << "map has height " << tiles.size() << std::endl;
-	std::cout << "map has width " << tiles[0].size() << std::endl;
+	// std::cout << "map has height " << tiles.size() << std::endl;
+	// std::cout << "map has width " << tiles[0].size() << std::endl;
 	for (auto row : tiles) {
 		for (auto tile : row) {
 			printf("(%d,%d)", tile->y_, tile->x_);
@@ -227,13 +227,13 @@ int main(int argc, char** args)
 					int column = mousex / tilesize;
 					if (players.size() == 0)
 					{
-						std::cout << "Creating human player" << std::endl;
+						// std::cout << "Creating human player" << std::endl;
 						players.push_back(new player(players.size(), *winSurface, true));
 						units.push_back(new unit(players.back(), tiles, 0, row, column, window, winSurface));
 					}
 					else if (players.size() < playerlimit)
 					{
-						std::cout << "Creating AI player" << std::endl;
+						// std::cout << "Creating AI player" << std::endl;
 						players.push_back(new player(players.size(), *winSurface, false));
 						units.push_back(new unit(players.back(), tiles, 0, row, column, window, winSurface));
 					}
