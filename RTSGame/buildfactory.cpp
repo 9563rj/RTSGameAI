@@ -30,7 +30,7 @@ void buildFactory(int row, int column, std::list<unit*>& units, std::vector<std:
 			if (tiles[unitPtr->tileAt_->y_ + 1][unitPtr->tileAt_->x_]->state_ == 3) belowClear = false;
 			if (aboveClear && leftClear && rightClear && belowClear)
 			{
-				// If main unit, also spawn Fighter, Builder, Miner
+				// If main unit, this can only be a Builder Factory, also spawn Fighter, Builder, Miner
 				if (unitPtr->type_ == 0)
 				{
 					if (unitPtr->tileAt_ == tiles[row][column] && (unitPtr->type_ == 0 || unitPtr->type_ == 2) && unitPtr->tileAt_->state_ == 0)
@@ -40,7 +40,7 @@ void buildFactory(int row, int column, std::list<unit*>& units, std::vector<std:
 						// Set this tile to be a factory tile and add it to the list of factory tiles
 						unitPtr->tileAt_->claimedBy_ = unitPtr->team_;
 						unitPtr->tileAt_->state_ = 3;
-						unitPtr->tileAt_->factoryType = factoryTypeSelector;
+						unitPtr->tileAt_->factoryType = 2;
 						factories.push_back(unitPtr->tileAt_);
 
 						// Create fighter, builder, and miner and add to relevant lists
