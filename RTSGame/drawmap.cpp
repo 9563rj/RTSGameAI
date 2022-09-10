@@ -15,6 +15,39 @@ void drawMap(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vecto
 			drawRect.x = i * tilesize;
 			drawRect.y = j * tilesize;
 			SDL_FillRect(winSurface, &drawRect, tiles[j][i]->getColor(*winSurface));
+			switch (tiles[j][i]->factoryType) 
+			{
+			case(0): // Main Unit Factory
+				break;
+			case(1): // Fighter Factory
+				drawRect.h = 25;
+				drawRect.w = 5;
+				drawRect.x += 10;
+				SDL_FillRect(winSurface, &drawRect, SDL_MapRGB(winSurface->format, 0, 255, 0));
+				drawRect.h = 5;
+				drawRect.w = 25;
+				drawRect.x -= 10;
+				drawRect.y += 10;
+				SDL_FillRect(winSurface, &drawRect, SDL_MapRGB(winSurface->format, 0, 255, 0));
+				break;
+			case(2): // Builder Factory
+				drawRect.h = 25;
+				drawRect.w = 6;
+				drawRect.x += 10;
+				SDL_FillRect(winSurface, &drawRect, SDL_MapRGB(winSurface->format, 0, 255, 0));
+				break;
+			case(3): // Miner Factory
+				drawRect.h = 11;
+				drawRect.w = 11;
+				drawRect.x += 7;
+				drawRect.y += 7;
+				SDL_FillRect(winSurface, &drawRect, SDL_MapRGB(winSurface->format, 0, 255, 0));
+				break;
+			}
+			drawRect.x = i * tilesize;
+			drawRect.y = j * tilesize;
+			drawRect.h = tilesize;
+			drawRect.w = tilesize;
 			/* Debug, render openclosed
 			if (tiles[j][i]->openclosed == 0)
 			{
@@ -41,15 +74,43 @@ void drawMap(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vecto
 			// Render units
 			// Optimization note: This searches every single unit for every single tile (redundant)
 			// Optimize by having each tile know whether or not there's a unit on it, and checking that and the corresponding unit
-			for (auto unit : units)
+			for (auto unitPtr : units)
 			{
-				if (unit->tileAt_->x_ == i && unit->tileAt_->y_ == j)
+				if (unitPtr->tileAt_->x_ == i && unitPtr->tileAt_->y_ == j)
 				{
 					drawRect.h -= 10;
 					drawRect.w -= 10;
 					drawRect.x += 5;
 					drawRect.y += 5;
-					SDL_FillRect(winSurface, &drawRect, unit->team_->color_);
+					SDL_FillRect(winSurface, &drawRect, unitPtr->team_->color_);
+					switch (unitPtr->type_)
+					{
+					case(0): // Main Unit
+						break;
+					case(1): // Fighter
+						drawRect.h = 15;
+						drawRect.w = 3;
+						drawRect.x += 6;
+						SDL_FillRect(winSurface, &drawRect, SDL_MapRGB(winSurface->format, 0, 255, 0));
+						drawRect.h = 3;
+						drawRect.w = 15;
+						drawRect.x -= 6;
+						drawRect.y += 6;
+						SDL_FillRect(winSurface, &drawRect, SDL_MapRGB(winSurface->format, 0, 255, 0));
+						break;
+					case(2): // Builder
+						drawRect.h = 15;
+						drawRect.w = 3;
+						drawRect.x += 6;
+						SDL_FillRect(winSurface, &drawRect, SDL_MapRGB(winSurface->format, 0, 255, 0));
+					case(3): // Miner
+						drawRect.h -= 8;
+						drawRect.w -= 8;
+						drawRect.x += 4;
+						drawRect.y += 4;
+						SDL_FillRect(winSurface, &drawRect, SDL_MapRGB(winSurface->format, 0, 255, 0));
+						break;
+					}
 					drawRect.h = tilesize;
 					drawRect.w = tilesize;
 				}
