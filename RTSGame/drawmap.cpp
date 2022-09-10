@@ -1,7 +1,7 @@
 #include "drawmap.h"
 #include "player.h"
 
-void drawMap(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vector<tile*>> &tiles, std::list<unit*>& units)
+void drawMap(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vector<tile*>> &tiles, std::list<unit*>& units, std::vector<player*>& players)
 {
 	SDL_Rect drawRect;
 	drawRect.h = tilesize;
@@ -56,6 +56,27 @@ void drawMap(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vecto
 			}
 		}
 	}
+	// Start resource bars at corner of border corner tile
+	drawRect.x = tilesize;
+	drawRect.y = tilesize;
+
+	// Draw resource bars
+	for (int i = 0; i < players.size(); i++)
+	{
+		drawRect.h = 18; // 4 px border around 100x10 resource bar
+		drawRect.w = 108;
+		SDL_FillRect(winSurface, &drawRect, players[i]->color_);
+		double resourcePercent = double(players[i]->resources_) / double(players[i]->maxResources_);
+		drawRect.x += 4;
+		drawRect.y += 4;
+		drawRect.h = 10; // 10 px tall inner bar
+		int barProgress = 100 * resourcePercent; // 100 px long
+		drawRect.w = barProgress;
+		SDL_FillRect(winSurface, &drawRect, SDL_MapRGB(winSurface->format, 0, 255, 0));
+		drawRect.x -= 4;
+		drawRect.y += 14 + 12; // 14 px down to corner of current bar, 12 px gap between bars
+	}
+
 	SDL_UpdateWindowSurface(window);
 	//std::cout << "Attempted update to window surface" << std::endl;
 }

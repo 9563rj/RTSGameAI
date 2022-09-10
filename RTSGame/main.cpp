@@ -74,7 +74,7 @@ int main(int argc, char** args)
 	// unit hero(players.back(), tiles, 0, startr, startc, window, winSurface);
 	// units.push_back(&hero);
 	// Draw initialized map
-	drawMap(winSurface, window, tiles, units);
+	drawMap(winSurface, window, tiles, units, players);
 
 	// Event loop
 	bool gameRunning = true;
@@ -89,7 +89,7 @@ int main(int argc, char** args)
 	int resourceMineInterval = 500;
 	Uint64 resourceTimer = SDL_GetTicks64() % resourceMineInterval;
 
-	int playerlimit = 18;
+	int playerlimit = 15;
 
 	// Main game loop
 	while (gameRunning)
@@ -123,9 +123,9 @@ int main(int argc, char** args)
 					int row = mousey / tilesize;
 					int column = mousex / tilesize;
 					bool cont = true;
-					if (currentunit == NULL)
+				if (currentunit == NULL) 
 					{
-						int mousex;
+						/*int mousex; deprecated, we don't want a new player on left click
 						int mousey;
 						SDL_GetMouseState(&mousex, &mousey);
 						int row = mousey / tilesize;
@@ -133,7 +133,8 @@ int main(int argc, char** args)
 						players.push_back(new player(players.size(), *winSurface));
 						units.push_back(new unit(players.back(), tiles, 0, row, column, window, winSurface));
 						players.back()->commander_ = units.back();
-						players.back()->units_.push_back(units.back());
+						players.back()->units_.push_back(units.back());*/
+						cont = false;
 					}
 					for (auto unit : units)
 					{
@@ -207,7 +208,7 @@ int main(int argc, char** args)
 			unit->advance(tiles);
 		}
 
-		drawMap(winSurface, window, tiles, units);
+		drawMap(winSurface, window, tiles, units, players);
 	}
 	// Cleanup
 	SDL_FreeSurface(winSurface);

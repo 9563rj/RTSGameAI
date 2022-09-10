@@ -3,11 +3,11 @@
 Uint32 player::teamColor(int team, SDL_Surface &winSurface)
 {
 	// Decide what color this new team should be
-	// Six different colors, specific shade decided by team%6
+	// Five different colors, specific shade decided by team%5
 
-	int six = 6;
-	int index = team / six;
-	int subindex = team % 6;
+	int five = 5;
+	int index = team / five;
+	int subindex = team % five;
 
 	switch (subindex)
 	{
@@ -15,18 +15,15 @@ Uint32 player::teamColor(int team, SDL_Surface &winSurface)
 		return(SDL_MapRGB(winSurface.format, 0, 0, 240 - index * 80));
 		break;
 	case(1):
-		return(SDL_MapRGB(winSurface.format, 0, 240 - index * 80, 240 - index * 80));
-		break;
-	case(2):
 		return(SDL_MapRGB(winSurface.format, 240 - index * 80, 0, 0));
 		break;
-	case(3):
+	case(2):
 		return(SDL_MapRGB(winSurface.format, 240 - index * 80, 0, 240 - index * 80));
 		break;
-	case(4):
+	case(3):
 		return(SDL_MapRGB(winSurface.format, 240 - index * 80, 240 - index * 80, 0));
 		break;
-	case(5):
+	case(4):
 		return(SDL_MapRGB(winSurface.format, 240 - index * 80, 240 - index * 80, 240 - index * 80));
 		break;
 	}
@@ -58,6 +55,7 @@ Uint32 player::teamColor(int team, SDL_Surface &winSurface)
 player::player(int team, SDL_Surface &winSurface)
 {
 	resources_ = 0;
+	maxResources_ = 100;
 	/*switch (team)
 	{
 	case(0):
