@@ -90,7 +90,7 @@ std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vecto
 				if (nj < 0) continue;
 				if (ni >= maph) continue;
 				if (nj >= mapw) continue;
-				if (tiles[ni][nj]->state_ == 1) continue;
+				if (tiles[ni][nj]->state_ == 1 || tiles[ni][nj]->state_ == 3) continue;
 				for (auto unit : units)
 				{
 					if (unit->tileAt_->x_ == nj && unit->tileAt_->y_ == ni)

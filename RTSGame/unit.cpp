@@ -21,6 +21,21 @@ unit::unit(player* team, const std::vector<std::vector<tile*>>& tiles, const int
 	surface_ = winSurface;
 	path_.clear();
 	team_ = team;
+	switch (type_)
+	{
+	case(0):
+		health_ = 10;
+		break;
+	case(1):
+		health_ = 50;
+		break;
+	case(2):
+		health_ = 10;
+		break;
+	case(3):
+		health_ = 100;
+		break;
+	}
 }
 
 void unit::advance(std::vector<std::vector<tile*>>& tiles)

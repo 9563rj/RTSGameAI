@@ -120,6 +120,7 @@ int main(int argc, char** args)
 						}
 						break;
 					case(SDLK_f):
+					{
 						int mousex;
 						int mousey;
 						SDL_GetMouseState(&mousex, &mousey);
@@ -140,61 +141,254 @@ int main(int argc, char** args)
 							std::list<unit*> unitsCopy = units;
 							for (auto unitPtr : unitsCopy)
 							{
-								// If main unit, also spawn Fighter, Builder, Miner
-								if (unitPtr->type_ == 0)
+								bool aboveClear = true;
+								bool leftClear = true;
+								bool rightClear = true;
+								bool belowClear = true;
+								if (tiles[unitPtr->tileAt_->y_ - 1][unitPtr->tileAt_->x_]->state_ == 3) aboveClear = false;
+								if (tiles[unitPtr->tileAt_->y_][unitPtr->tileAt_->x_ - 1]->state_ == 3) leftClear = false;
+								if (tiles[unitPtr->tileAt_->y_][unitPtr->tileAt_->x_ + 1]->state_ == 3) rightClear = false;
+								if (tiles[unitPtr->tileAt_->y_ + 1][unitPtr->tileAt_->x_]->state_ == 3) belowClear = false;
+								if (aboveClear && leftClear && rightClear && belowClear)
 								{
-									if (unitPtr->tileAt_ == tiles[row][column] && (unitPtr->type_ == 0 || unitPtr->type_ == 2) && unitPtr->tileAt_->state_ == 0)
+									// If main unit, also spawn Fighter, Builder, Miner
+									if (unitPtr->type_ == 0)
 									{
-										if (currentunit == unitPtr) currentunit = NULL;
+										if (unitPtr->tileAt_ == tiles[row][column] && (unitPtr->type_ == 0 || unitPtr->type_ == 2) && unitPtr->tileAt_->state_ == 0)
+										{
+											if (currentunit == unitPtr) currentunit = NULL;
 
-										// Set this tile to be a factory tile and add it to the list of factory tiles
-										unitPtr->tileAt_->claimedBy_ = unitPtr->team_;
-										unitPtr->tileAt_->state_ = 3;
-										unitPtr->tileAt_->factoryType = 1;
-										factories.push_back(unitPtr->tileAt_);
+											// Set this tile to be a factory tile and add it to the list of factory tiles
+											unitPtr->tileAt_->claimedBy_ = unitPtr->team_;
+											unitPtr->tileAt_->state_ = 3;
+											unitPtr->tileAt_->factoryType = 1;
+											factories.push_back(unitPtr->tileAt_);
 
-										// Create fighter, builder, and miner and add to relevant lists
-										units.push_back(new unit(unitPtr->team_, tiles, 1, row - 1, column, window, winSurface));
-										unitPtr->team_->units_.push_back(units.back());
-										units.push_back(new unit(unitPtr->team_, tiles, 2, row, column + 1, window, winSurface));
-										unitPtr->team_->units_.push_back(units.back());
-										units.push_back(new unit(unitPtr->team_, tiles, 3, row + 1, column, window, winSurface));
-										unitPtr->team_->units_.push_back(units.back());
+											// Create fighter, builder, and miner and add to relevant lists
+											units.push_back(new unit(unitPtr->team_, tiles, 1, row - 1, column, window, winSurface));
+											unitPtr->team_->units_.push_back(units.back());
+											units.push_back(new unit(unitPtr->team_, tiles, 2, row, column + 1, window, winSurface));
+											unitPtr->team_->units_.push_back(units.back());
+											units.push_back(new unit(unitPtr->team_, tiles, 3, row + 1, column, window, winSurface));
+											unitPtr->team_->units_.push_back(units.back());
 
-										// Erase from list of units held by this unit's team
-										std::list<unit*>& teamUnitList = unitPtr->team_->units_;
-										teamUnitList.erase(std::find(teamUnitList.begin(), teamUnitList.end(), unitPtr));
+											// Erase from list of units held by this unit's team
+											std::list<unit*>& teamUnitList = unitPtr->team_->units_;
+											teamUnitList.erase(std::find(teamUnitList.begin(), teamUnitList.end(), unitPtr));
 
-										// Erase from global list of units
-										units.erase(std::find(units.begin(), units.end(), unitPtr));
+											// Erase from global list of units
+											units.erase(std::find(units.begin(), units.end(), unitPtr));
 
-										delete unitPtr;
+											delete unitPtr;
+										}
 									}
-								}
-								else if (unitPtr->type_ == 2)
-								{
-									if (unitPtr->tileAt_ == tiles[row][column] && (unitPtr->type_ == 0 || unitPtr->type_ == 2) && unitPtr->tileAt_->state_ == 0)
+									else if (unitPtr->type_ == 2)
 									{
-										if (currentunit == unitPtr) currentunit = NULL;
+										if (unitPtr->tileAt_ == tiles[row][column] && (unitPtr->type_ == 0 || unitPtr->type_ == 2) && unitPtr->tileAt_->state_ == 0)
+										{
+											if (currentunit == unitPtr) currentunit = NULL;
 
-										// Set this tile to be a factory tile and add it to the list of factory tiles
-										unitPtr->tileAt_->claimedBy_ = unitPtr->team_;
-										unitPtr->tileAt_->state_ = 3;
-										unitPtr->tileAt_->factoryType = 1;
-										factories.push_back(unitPtr->tileAt_);
+											// Set this tile to be a factory tile and add it to the list of factory tiles
+											unitPtr->tileAt_->claimedBy_ = unitPtr->team_;
+											unitPtr->tileAt_->state_ = 3;
+											unitPtr->tileAt_->factoryType = 1;
+											factories.push_back(unitPtr->tileAt_);
 
-										// Erase from list of units held by this unit's team
-										std::list<unit*>& teamUnitList = unitPtr->team_->units_;
-										teamUnitList.erase(std::find(teamUnitList.begin(), teamUnitList.end(), unitPtr));
+											// Erase from list of units held by this unit's team
+											std::list<unit*>& teamUnitList = unitPtr->team_->units_;
+											teamUnitList.erase(std::find(teamUnitList.begin(), teamUnitList.end(), unitPtr));
 
-										// Erase from global list of units
-										units.erase(std::find(units.begin(), units.end(), unitPtr));
+											// Erase from global list of units
+											units.erase(std::find(units.begin(), units.end(), unitPtr));
 
-										delete unitPtr;
+											delete unitPtr;
+										}
 									}
 								}
 							}
 						}
+						break;
+					}
+					case(SDLK_b):
+					{
+						int mousex;
+						int mousey;
+						SDL_GetMouseState(&mousex, &mousey);
+						int row = mousey / tilesize;
+						int column = mousex / tilesize;
+						if (units.size() > 0)
+						{
+							/*std::cout << "There are " << units.size() << " units." << std::endl;
+							std::list<unit*>::iterator it;
+							for (it = units.begin(); it != units.end(); it++)
+							{
+								std::cout << "unit pointer is " << *it << std::endl;
+								std::system("pause");
+							}
+							*/
+
+							// Create copy of units to avoid modifying a currently iterated list
+							std::list<unit*> unitsCopy = units;
+							for (auto unitPtr : unitsCopy)
+							{
+								bool aboveClear = true;
+								bool leftClear = true;
+								bool rightClear = true;
+								bool belowClear = true;
+								if (tiles[unitPtr->tileAt_->y_ - 1][unitPtr->tileAt_->x_]->state_ == 3) aboveClear = false;
+								if (tiles[unitPtr->tileAt_->y_][unitPtr->tileAt_->x_ - 1]->state_ == 3) leftClear = false;
+								if (tiles[unitPtr->tileAt_->y_][unitPtr->tileAt_->x_ + 1]->state_ == 3) rightClear = false;
+								if (tiles[unitPtr->tileAt_->y_ + 1][unitPtr->tileAt_->x_]->state_ == 3) belowClear = false;
+								if (aboveClear && leftClear && rightClear && belowClear)
+								{
+									// If main unit, also spawn Fighter, Builder, Miner
+									if (unitPtr->type_ == 0)
+									{
+										if (unitPtr->tileAt_ == tiles[row][column] && (unitPtr->type_ == 0 || unitPtr->type_ == 2) && unitPtr->tileAt_->state_ == 0)
+										{
+											if (currentunit == unitPtr) currentunit = NULL;
+
+											// Set this tile to be a factory tile and add it to the list of factory tiles
+											unitPtr->tileAt_->claimedBy_ = unitPtr->team_;
+											unitPtr->tileAt_->state_ = 3;
+											unitPtr->tileAt_->factoryType = 2;
+											factories.push_back(unitPtr->tileAt_);
+
+											// Create fighter, builder, and miner and add to relevant lists
+											units.push_back(new unit(unitPtr->team_, tiles, 1, row - 1, column, window, winSurface));
+											unitPtr->team_->units_.push_back(units.back());
+											units.push_back(new unit(unitPtr->team_, tiles, 2, row, column + 1, window, winSurface));
+											unitPtr->team_->units_.push_back(units.back());
+											units.push_back(new unit(unitPtr->team_, tiles, 3, row + 1, column, window, winSurface));
+											unitPtr->team_->units_.push_back(units.back());
+
+											// Erase from list of units held by this unit's team
+											std::list<unit*>& teamUnitList = unitPtr->team_->units_;
+											teamUnitList.erase(std::find(teamUnitList.begin(), teamUnitList.end(), unitPtr));
+
+											// Erase from global list of units
+											units.erase(std::find(units.begin(), units.end(), unitPtr));
+
+											delete unitPtr;
+										}
+									}
+									else if (unitPtr->type_ == 2)
+									{
+										if (unitPtr->tileAt_ == tiles[row][column] && (unitPtr->type_ == 0 || unitPtr->type_ == 2) && unitPtr->tileAt_->state_ == 0)
+										{
+											if (currentunit == unitPtr) currentunit = NULL;
+
+											// Set this tile to be a factory tile and add it to the list of factory tiles
+											unitPtr->tileAt_->claimedBy_ = unitPtr->team_;
+											unitPtr->tileAt_->state_ = 3;
+											unitPtr->tileAt_->factoryType = 2;
+											factories.push_back(unitPtr->tileAt_);
+
+											// Erase from list of units held by this unit's team
+											std::list<unit*>& teamUnitList = unitPtr->team_->units_;
+											teamUnitList.erase(std::find(teamUnitList.begin(), teamUnitList.end(), unitPtr));
+
+											// Erase from global list of units
+											units.erase(std::find(units.begin(), units.end(), unitPtr));
+
+											delete unitPtr;
+										}
+									}
+								}
+							}
+						}
+						break;
+					}
+					case(SDLK_m):
+					{
+						int mousex;
+						int mousey;
+						SDL_GetMouseState(&mousex, &mousey);
+						int row = mousey / tilesize;
+						int column = mousex / tilesize;
+						if (units.size() > 0)
+						{
+							/*std::cout << "There are " << units.size() << " units." << std::endl;
+							std::list<unit*>::iterator it;
+							for (it = units.begin(); it != units.end(); it++)
+							{
+								std::cout << "unit pointer is " << *it << std::endl;
+								std::system("pause");
+							}
+							*/
+
+							// Create copy of units to avoid modifying a currently iterated list
+							std::list<unit*> unitsCopy = units;
+							for (auto unitPtr : unitsCopy)
+							{
+								bool aboveClear = true;
+								bool leftClear = true;
+								bool rightClear = true;
+								bool belowClear = true;
+								if (tiles[unitPtr->tileAt_->y_ - 1][unitPtr->tileAt_->x_]->state_ == 3) aboveClear = false;
+								if (tiles[unitPtr->tileAt_->y_][unitPtr->tileAt_->x_ - 1]->state_ == 3) leftClear = false;
+								if (tiles[unitPtr->tileAt_->y_][unitPtr->tileAt_->x_ + 1]->state_ == 3) rightClear = false;
+								if (tiles[unitPtr->tileAt_->y_ + 1][unitPtr->tileAt_->x_]->state_ == 3) belowClear = false;
+								if (aboveClear && leftClear && rightClear && belowClear)
+								{
+									// If main unit, also spawn Fighter, Builder, Miner
+									if (unitPtr->type_ == 0)
+									{
+										if (unitPtr->tileAt_ == tiles[row][column] && (unitPtr->type_ == 0 || unitPtr->type_ == 2) && unitPtr->tileAt_->state_ == 0)
+										{
+											if (currentunit == unitPtr) currentunit = NULL;
+
+											// Set this tile to be a factory tile and add it to the list of factory tiles
+											unitPtr->tileAt_->claimedBy_ = unitPtr->team_;
+											unitPtr->tileAt_->state_ = 3;
+											unitPtr->tileAt_->factoryType = 3;
+											factories.push_back(unitPtr->tileAt_);
+
+											// Create fighter, builder, and miner and add to relevant lists
+											units.push_back(new unit(unitPtr->team_, tiles, 1, row - 1, column, window, winSurface));
+											unitPtr->team_->units_.push_back(units.back());
+											units.push_back(new unit(unitPtr->team_, tiles, 2, row, column + 1, window, winSurface));
+											unitPtr->team_->units_.push_back(units.back());
+											units.push_back(new unit(unitPtr->team_, tiles, 3, row + 1, column, window, winSurface));
+											unitPtr->team_->units_.push_back(units.back());
+
+											// Erase from list of units held by this unit's team
+											std::list<unit*>& teamUnitList = unitPtr->team_->units_;
+											teamUnitList.erase(std::find(teamUnitList.begin(), teamUnitList.end(), unitPtr));
+
+											// Erase from global list of units
+											units.erase(std::find(units.begin(), units.end(), unitPtr));
+
+											delete unitPtr;
+										}
+									}
+									else if (unitPtr->type_ == 2)
+									{
+										if (unitPtr->tileAt_ == tiles[row][column] && (unitPtr->type_ == 0 || unitPtr->type_ == 2) && unitPtr->tileAt_->state_ == 0)
+										{
+											if (currentunit == unitPtr) currentunit = NULL;
+
+											// Set this tile to be a factory tile and add it to the list of factory tiles
+											unitPtr->tileAt_->claimedBy_ = unitPtr->team_;
+											unitPtr->tileAt_->state_ = 3;
+											unitPtr->tileAt_->factoryType = 3;
+											factories.push_back(unitPtr->tileAt_);
+
+											// Erase from list of units held by this unit's team
+											std::list<unit*>& teamUnitList = unitPtr->team_->units_;
+											teamUnitList.erase(std::find(teamUnitList.begin(), teamUnitList.end(), unitPtr));
+
+											// Erase from global list of units
+											units.erase(std::find(units.begin(), units.end(), unitPtr));
+
+											delete unitPtr;
+										}
+									}
+								}
+							}
+						}
+						break;
+					}
 				}
 			case(SDL_MOUSEBUTTONUP):
 				if (event.button.button == SDL_BUTTON_LEFT)
@@ -231,7 +425,7 @@ int main(int argc, char** args)
 					{
 						targr = row;
 						targc = column;
-						if (tiles[row][column]->state_ != 1)
+						if (tiles[row][column]->state_ != 1 && tiles[row][column]->state_ != 3)
 						{
 							for (int r = 0; r < tiles.size(); r++)
 							{
@@ -306,13 +500,50 @@ int main(int argc, char** args)
 			}
 		}
 
-		for(auto unit : units)
+		// Compute combat
+		std::list<unit*> deadUnits;
+		for(auto unitPtr : units)
 		{
+			if (unitPtr->type_ == 1)
+			{
+				for (auto targetPtr : units)
+				{
+					int targetX = targetPtr->tileAt_->x_;
+					int targetY = targetPtr->tileAt_->y_;
+					int selfX = unitPtr->tileAt_->x_;
+					int selfY = unitPtr->tileAt_->y_;
+					
+					bool above = (targetX == selfX && targetY == selfY - 1);
+					bool left = (targetX == selfX - 1 && targetY == selfY);
+					bool right = (targetX == selfX + 1 && targetY == selfY);
+					bool below = (targetX == selfX && targetY == selfY + 1);
+					if ((above || left || right || below) && (targetPtr->team_ != unitPtr->team_))
+					{
+						targetPtr->health_ -= 1;
+						if (targetPtr->health_ < 1) deadUnits.push_back(targetPtr);
+					}
+				}
+			}
 			if (miningTimerDone)
 			{
-					unit->resourceMineFlag = true;
+					unitPtr->resourceMineFlag = true;
 			}
-			unit->advance(tiles);
+			unitPtr->advance(tiles);
+		}
+
+		// Kill units that died during this frame, avoids modifying actively iterated lists
+		for (auto deadPtr : deadUnits)
+		{
+			player* deadPtrTeam = deadPtr->team_;
+			std::list<unit*>::iterator deadUnit = std::find(deadPtrTeam->units_.begin(), deadPtrTeam->units_.end(), deadPtr);
+			if (deadUnit != deadPtrTeam->units_.end())
+			{
+				//std::cout << "Dead unit found in units list. Pointer is " << deadPtr << std::endl;
+				deadPtrTeam->units_.erase(deadUnit);
+			}
+			else std::cout << "Dead unit not found in units list. Pointer is " << deadPtr << std::endl;
+			units.erase(std::find(units.begin(), units.end(), deadPtr));
+			delete deadPtr;
 		}
 
 		drawMap(winSurface, window, tiles, units, players);

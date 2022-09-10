@@ -16,6 +16,7 @@ struct unit // Parallel definitions in unit.h and tile.cpp
 	2 = Builder
 	3 = Miner
 	*/
+	int health_;
 	SDL_Window* window_;
 	SDL_Surface* surface_;
 	tile* tileAt_;
