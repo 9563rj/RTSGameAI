@@ -1,5 +1,25 @@
 #include "player.h"
 
+player::player(int team, SDL_Surface& winSurface)
+{
+	resources_ = 0;
+	maxResources_ = 100;
+	/*switch (team)
+	{
+	case(0):
+		color_ = SDL_MapRGB(winSurface.format, 0, 0, 200);
+		break;
+	case(1):
+		color_ = SDL_MapRGB(winSurface.format, 200, 0, 0);
+		break;
+	default:
+		std::cout << "Attempted to set player to unknown team" << std::endl;
+		std::system("pause");
+		exit(1);
+	}*/
+	color_ = teamColor(team, winSurface);
+}
+
 Uint32 player::teamColor(int team, SDL_Surface &winSurface)
 {
 	// Decide what color this new team should be
@@ -52,22 +72,3 @@ Uint32 player::teamColor(int team, SDL_Surface &winSurface)
 	exit(1);*/
 }
 
-player::player(int team, SDL_Surface &winSurface)
-{
-	resources_ = 0;
-	maxResources_ = 100;
-	/*switch (team)
-	{
-	case(0):
-		color_ = SDL_MapRGB(winSurface.format, 0, 0, 200);
-		break;
-	case(1):
-		color_ = SDL_MapRGB(winSurface.format, 200, 0, 0);
-		break;
-	default:
-		std::cout << "Attempted to set player to unknown team" << std::endl;
-		std::system("pause");
-		exit(1);
-	}*/
-	color_ = teamColor(team, winSurface);
-}

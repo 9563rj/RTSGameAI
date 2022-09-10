@@ -1,7 +1,7 @@
 #pragma once
 #include "unit.h"
 
-struct player
+struct player // Parallel definitions in unit.cpp, tile.cpp, player.h
 {
 	player(int team, SDL_Surface& winSurface);
 	Uint32 teamColor(int team, SDL_Surface& winSurface);

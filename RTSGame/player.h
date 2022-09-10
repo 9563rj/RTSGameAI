@@ -1,6 +1,6 @@
 #include "main.h"
 struct unit;
-struct player // Any time this is changed, update parallel definition in unit.cpp
+struct player // Parallel definitions in unit.cpp, tile.cpp, player.h
 {
 	player(int team, SDL_Surface &winSurface);
 	Uint32 teamColor(int team, SDL_Surface &winSurface);

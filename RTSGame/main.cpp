@@ -74,7 +74,7 @@ int main(int argc, char** args)
 	// unit hero(players.back(), tiles, 0, startr, startc, window, winSurface);
 	// units.push_back(&hero);
 	// Draw initialized map
-	drawMap(winSurface, window, tiles, units, players);
+	// drawMap(winSurface, window, tiles, units, players);
 
 	// Event loop
 	bool gameRunning = true;
@@ -84,6 +84,9 @@ int main(int argc, char** args)
 	
 	std::vector<tile*> path;
 	unit* currentunit = NULL;
+
+	// Create list of factories, so that not every tile has to be searched for spawning loop
+	std::list<tile*> factories;
 
 	// Initialize resource timer
 	int resourceMineInterval = 500;
@@ -183,6 +186,35 @@ int main(int argc, char** args)
 					}
 					players.back()->commander_ = units.back();
 					players.back()->units_.push_back(units.back());
+				}
+				else if (event.button.button == SDL_BUTTON_MIDDLE)
+				{
+					int mousex;
+					int mousey;
+					SDL_GetMouseState(&mousex, &mousey);
+					int row = mousey / tilesize;
+					int column = mousex / tilesize;
+					for (auto unitPtr : units)
+					{
+						if (unitPtr->tileAt_ == tiles[row][column] && (unitPtr->type_ == 0 || unitPtr->type_ == 2) && unitPtr->tileAt_->state_ == 0)
+						{
+							if (currentunit == unitPtr) currentunit = NULL;
+
+							// Set this tile to be a factory tile and add it to the list of factory tiles
+							unitPtr->tileAt_->claimedBy_ = unitPtr->team_;
+							unitPtr->tileAt_->state_ = 3;
+							factories.push_back(unitPtr->tileAt_);
+
+							// Erase from list of units held by this unit's team
+							std::list<unit*> &teamUnitList = unitPtr->team_->units_;
+							teamUnitList.erase(std::find(teamUnitList.begin(), teamUnitList.end(), unitPtr));
+
+							// Erase from global list of units
+							units.erase(std::find(units.begin(), units.end(), unitPtr));
+
+							delete unitPtr;
+						}
+					}
 				}
 				break;
 		}
