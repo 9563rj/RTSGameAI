@@ -5,6 +5,7 @@
 tile::tile(const int& state, int& x, int& y)
 {
 	state_ = state;
+	magicflag = 62;
 	openclosed = 2;
 	onpath = false;
 	claimedBy_ = NULL;

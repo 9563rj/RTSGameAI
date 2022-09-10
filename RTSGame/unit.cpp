@@ -40,10 +40,19 @@ void unit::advance(std::vector<std::vector<tile*>>& tiles)
 			// int oldx = tileAt_->x_;
 			// int oldy = tileAt_->y_;
 			// tileAt_->onpath = true;
+			if (tileAt_->magicflag != 62)
+			{
+				std::cout << "Magic flag of unit " << this << " at tile " << tileAt_ << " was not 62 before moving." << std::endl;
+				std::system("pause");
+			}
 			tileAt_->unitAt_ = NULL;
 			tileAt_ = path_.front();
 			tileAt_->unitAt_ = this;
 			path_.pop_front();
+			if (tileAt_->magicflag != 62)
+			{
+				std::cout << "Magic flag of unit " << this << " on tile " << tileAt_ << " was not 62 after moving." << std::endl;
+			}
 			// SDL_Delay(75);
 			unitMoveFlag = false;
 			// tileAt_->state_ = 2;

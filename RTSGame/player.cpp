@@ -101,9 +101,48 @@ void player::act(std::list<unit*>& units, std::list<tile*>& factories, std::vect
 			{
 				std::cout << "Player with pointer " << this << " attempted to move a unit, but has no units left" << std::endl;
 			}
+			else if ((*it)->type_ == 3)
+			{
+				std::list<tile*> resourceTiles;
+				for (std::vector<std::vector<tile*>>::iterator rowit = tiles.begin(); rowit != tiles.end(); rowit++)
+				{
+					for (std::vector<tile*>::iterator columnit = rowit->begin(); columnit != rowit->end(); columnit++)
+					{
+						if ((*columnit)->state_ == 2 && (*columnit)->unitAt_ == NULL)
+						{
+							resourceTiles.push_back(*columnit);
+						}
+					}
+				}
+				if (resourceTiles.size() > 0)
+				{
+					std::cout << resourceTiles.size() << " valid resources found" << std::endl;
+					std::vector<int> pathCosts;
+					std::vector<std::vector<tile*>> paths;
+					for (std::list<tile*>::iterator resourceit = resourceTiles.begin(); resourceit != resourceTiles.end(); resourceit++)
+					{
+						std::vector<tile*> path = astar(winSurface, window, tiles, units, (*it)->tileAt_, *resourceit);
+						if (path.size() == 0)
+						{
+							std::cout << "Invalid AI miner path: empty" << std::endl;
+						}
+						else
+						{
+							paths.push_back(path);
+							pathCosts.push_back(path.size());
+						}
+					}
+					std::vector<int>::iterator lowestPathCostIt = min_element(pathCosts.begin(), pathCosts.end());
+					int pathIndex = lowestPathCostIt - pathCosts.begin();
+					std::cout << "There are " << pathCosts.size() << " path costs." << std::endl;
+					std::cout << "There are " << paths.size() << " paths." << std::endl;
+					std::cout << "Attempting to access index " << pathIndex << std::endl;
+ 					if (pathCosts.size() > 0) (*it)->navigate(tiles, units, paths[pathIndex].back(), winSurface, window); // Must be at least one valid path to navigate 
+				}
+			}
 			else (*it)->navigate(tiles, units, tiles[row][column], winSurface, window);
 		}
-		else if (r >= .8)
+		else if (.8 <= r <= 1)
 		{
 			std::cout << "Decided to build, picker was " << r << std::endl;
 			for (auto unitPtr : units_)
@@ -111,7 +150,7 @@ void player::act(std::list<unit*>& units, std::list<tile*>& factories, std::vect
 				if (unitPtr->type_ == 0 || unitPtr->type_ == 2)
 				{
 					double factoryTypePicker = rand() / double(RAND_MAX);
-					int factoryTypeSelector = factoryTypePicker * 2 + 1;
+					int factoryTypeSelector = factoryTypePicker * 3 + 1;
 					std::cout << "Attempting to build factory of type " << factoryTypeSelector << " at " << unitPtr->tileAt_->x_ << ", " << unitPtr->tileAt_->y_ << std::endl;
 					buildFactory(unitPtr->tileAt_->y_, unitPtr->tileAt_->x_, units, tiles, factories, unitPtr, winSurface, window, factoryTypeSelector);
 					break;

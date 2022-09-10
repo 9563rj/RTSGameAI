@@ -171,6 +171,11 @@ int main(int argc, char** args)
 					SDL_GetMouseState(&mousex, &mousey);
 					int row = mousey / tilesize;
 					int column = mousex / tilesize;
+					// Ignore clicks outside the board
+					if (row > tiles.size()) break;
+					if (column > tiles[0].size()) break;
+					if (row < 0) break;
+					if (column < 0) break;
 					bool cont = true;
 				if (currentunit == NULL) 
 					{
