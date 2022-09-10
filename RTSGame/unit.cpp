@@ -1,4 +1,16 @@
+#pragma once
 #include "unit.h"
+
+struct player
+{
+	player(int team, SDL_Surface& winSurface);
+	Uint32 teamColor(int team, SDL_Surface& winSurface);
+	int resources_;
+	Uint32 color_;
+	unit* commander_;
+	std::list<unit*> units_;
+};
+
 unit::unit(player* team, const std::vector<std::vector<tile*>>& tiles, const int type, const int row, const int column, SDL_Window* window, SDL_Surface* winSurface)
 {
 	tileAt_ = tiles[row][column];
@@ -21,6 +33,11 @@ void unit::advance(std::vector<std::vector<tile*>>& tiles)
 		path_.pop_front();
 		SDL_Delay(75);
 		// tileAt_->state_ = 2;
+	}
+	else if (tileAt_->state_ == 2 && resourceMineFlag)
+	{
+		team_->resources_++;
+		resourceMineFlag = false;
 	}
 }
 

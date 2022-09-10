@@ -84,6 +84,14 @@ int main(int argc, char** args)
 	
 	std::vector<tile*> path;
 	unit* currentunit = NULL;
+
+	// Initialize resource timer
+	int resourceMineInterval = 500;
+	Uint64 resourceTimer = SDL_GetTicks64() % resourceMineInterval;
+
+	int playerlimit = 18;
+
+	// Main game loop
 	while (gameRunning)
 	{
 		SDL_PollEvent(&event);
@@ -97,6 +105,12 @@ int main(int argc, char** args)
 				{
 					case(SDLK_ESCAPE):
 						gameRunning = false;
+						break;
+					case(SDLK_r):
+						for (int i = 0; i < players.size(); i++)
+						{
+							std::cout << "Player " << i << " has " << players[i]->resources_ << " resources." << std::endl;
+						}
 						break;
 				}
 			case(SDL_MOUSEBUTTONUP):
@@ -156,7 +170,6 @@ int main(int argc, char** args)
 					SDL_GetMouseState(&mousex, &mousey);
 					int row = mousey / tilesize;
 					int column = mousex / tilesize;
-					int playerlimit = 21;
 					if (players.size() < playerlimit)
 					{
 						players.push_back(new player(players.size(), *winSurface));
@@ -172,10 +185,28 @@ int main(int argc, char** args)
 				}
 				break;
 		}
+
+		// done separate from searching every unit, so every unit only has to be searched once
+		bool miningTimerDone = false;
+		if (resourceTimer > SDL_GetTicks64() % resourceMineInterval)
+		{
+			miningTimerDone = true;
+			resourceTimer = SDL_GetTicks64() % resourceMineInterval;
+		}
+		else
+		{
+			resourceTimer = SDL_GetTicks64() % resourceMineInterval;
+		}
+
 		for(auto unit : units)
 		{
+			if (miningTimerDone)
+			{
+					unit->resourceMineFlag = true;
+			}
 			unit->advance(tiles);
 		}
+
 		drawMap(winSurface, window, tiles, units);
 	}
 	// Cleanup

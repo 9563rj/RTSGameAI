@@ -73,8 +73,8 @@ void initMap(std::vector<std::vector<tile*>> &tiles, bool skiptarg, bool skipsta
 		for (char ch : buffer)
 		{
 			int state = ch - '0';
-			if (skiptarg && state == 3) { state = 0; }
-			if (skipstart && state == 2) { state = 0; }
+			// if (skiptarg && state == 3) { state = 0; }	deprecated
+			// if (skipstart && state == 2) { state = 0; }	deprecated
 			row.push_back(new tile(state));
 		}
 		tiles.push_back(row);
