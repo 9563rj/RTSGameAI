@@ -9,6 +9,7 @@ std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vecto
 	// Initialization
 	std::list<tile*> open;
 	std::list<tile*> closed;
+	std::vector<tile*> empty;
 	tile* current = start;
 	tile* goal = finish;
 	tile* begin = start;
@@ -144,9 +145,11 @@ std::vector<tile*> astar(SDL_Surface* winSurface, SDL_Window* window, std::vecto
 		drawMap(winSurface, window, tiles);
 		*/
 	}
-	std::cout << "Error: Open list became empty" << std::endl;
-	system("pause");
-	exit(1);
+	std::cout << "Error: Open list became empty, could not find path" << std::endl;
+	return empty;
+
+	// system("pause");
+	// exit(1);
 GET_MOVE_SEQUENCE:
 	std::vector<tile*> path;
 	while (current != begin)

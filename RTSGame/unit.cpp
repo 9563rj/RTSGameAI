@@ -1,17 +1,7 @@
 #pragma once
 #include "unit.h"
 #include "tile.h"
-
-struct player // Parallel definitions in unit.cpp, tile.cpp, player.h
-{
-	player(int team, SDL_Surface& winSurface);
-	Uint32 teamColor(int team, SDL_Surface& winSurface);
-	int resources_;
-	int maxResources_;
-	Uint32 color_;
-	unit* commander_;
-	std::list<unit*> units_;
-};
+#include "player.h"
 
 unit::unit(player* team, const std::vector<std::vector<tile*>>& tiles, const int type, const int row, const int column, SDL_Window* window, SDL_Surface* winSurface)
 {
@@ -21,6 +11,8 @@ unit::unit(player* team, const std::vector<std::vector<tile*>>& tiles, const int
 	surface_ = winSurface;
 	path_.clear();
 	team_ = team;
+	resourceMineFlag = true;
+	unitMoveFlag = true;
 	switch (type_)
 	{
 	case(0):
@@ -40,16 +32,28 @@ unit::unit(player* team, const std::vector<std::vector<tile*>>& tiles, const int
 
 void unit::advance(std::vector<std::vector<tile*>>& tiles)
 {
-	if (path_.size() != 0)
+	if (path_.size() != 0 && unitMoveFlag)
 	{
-		// tileAt_->state_ = 0;
-		int oldx = tileAt_->x_;
-		int oldy = tileAt_->y_;
-		tileAt_->onpath = true;
-		tileAt_ = path_.front();
-		path_.pop_front();
-		SDL_Delay(75);
-		// tileAt_->state_ = 2;
+		if (path_.front()->unitAt_ == NULL)
+		{
+			// tileAt_->state_ = 0;
+			// int oldx = tileAt_->x_;
+			// int oldy = tileAt_->y_;
+			// tileAt_->onpath = true;
+			tileAt_->unitAt_ = NULL;
+			tileAt_ = path_.front();
+			tileAt_->unitAt_ = this;
+			path_.pop_front();
+			// SDL_Delay(75);
+			unitMoveFlag = false;
+			// tileAt_->state_ = 2;
+		}
+		else
+		{
+			path_.clear();
+			std::cout << "Unit " << this << " was blocked at " << tileAt_->x_ << ", " << tileAt_->y_ << std::endl;
+		}
+
 	}
 	else if (tileAt_->state_ == 2 && resourceMineFlag && team_->resources_ < team_->maxResources_ && type_ == 3)
 	{

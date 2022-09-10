@@ -25,4 +25,5 @@ struct tile
 	int g_;
 	int h_;
 	player* claimedBy_;
+	unit* unitAt_;
 };

@@ -7,6 +7,5 @@ struct player // Parallel definitions in unit.cpp, tile.cpp, player.h
 	int resources_;
 	int maxResources_;
 	Uint32 color_;
-	unit* commander_;
 	std::list<unit*> units_;
 };

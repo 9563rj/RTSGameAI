@@ -1,16 +1,6 @@
 #include "unit.h"
 #include "tile.h"
-
-struct player // Parallel definitions in unit.cpp, tile.cpp, player.h
-{
-	player(int team, SDL_Surface& winSurface);
-	Uint32 teamColor(int team, SDL_Surface& winSurface);
-	int resources_;
-	int maxResources_;
-	Uint32 color_;
-	unit* commander_;
-	std::list<unit*> units_;
-};
+#include "player.h"
 
 tile::tile(const int& state, int& x, int& y)
 {
@@ -18,6 +8,7 @@ tile::tile(const int& state, int& x, int& y)
 	openclosed = 2;
 	onpath = false;
 	claimedBy_ = NULL;
+	unitAt_ = NULL;
 	factoryType = 0;
 	x_ = x;
 	y_ = y;

@@ -96,11 +96,16 @@ int main(int argc, char** args)
 	int unitSpawnInterval = 10000;
 	Uint64 unitSpawnTimer = SDL_GetTicks64() % unitSpawnInterval;
 
+	// Init move timer
+	int unitMoveInterval = 75;
+	Uint64 unitMoveTimer = SDL_GetTicks64() % unitMoveInterval;
+
 	int playerlimit = 15;
 
 	// Main game loop
 	while (gameRunning)
 	{
+		Uint64 start = SDL_GetPerformanceCounter();
 		SDL_PollEvent(&event);
 		switch (event.type)
 		{
@@ -458,7 +463,6 @@ int main(int argc, char** args)
 						std::cout << "Exceeded player limit, which is " << playerlimit << std::endl;
 						std::system("pause");
 					}
-					players.back()->commander_ = units.back();
 					players.back()->units_.push_back(units.back());
 				}
 				else if (event.button.button == SDL_BUTTON_MIDDLE)
@@ -500,10 +504,22 @@ int main(int argc, char** args)
 			}
 		}
 
-		// Compute combat
+		bool unitMoveTimerDone = false;
+		if (unitMoveTimer > SDL_GetTicks64() % unitMoveInterval)
+		{
+			unitMoveTimerDone = true;
+			unitMoveTimer = SDL_GetTicks64() % unitMoveInterval;
+		}
+		else
+		{
+			unitMoveTimer = SDL_GetTicks64() % unitMoveInterval;
+		}
+
+		// Cycle through every unit, compute combat, mining, and moving
 		std::list<unit*> deadUnits;
 		for(auto unitPtr : units)
 		{
+			if (unitMoveTimerDone) unitPtr->unitMoveFlag = true;
 			if (unitPtr->type_ == 1)
 			{
 				for (auto targetPtr : units)
@@ -524,10 +540,7 @@ int main(int argc, char** args)
 					}
 				}
 			}
-			if (miningTimerDone)
-			{
-					unitPtr->resourceMineFlag = true;
-			}
+			if (miningTimerDone) unitPtr->resourceMineFlag = true;
 			unitPtr->advance(tiles);
 		}
 
@@ -547,6 +560,12 @@ int main(int argc, char** args)
 		}
 
 		drawMap(winSurface, window, tiles, units, players);
+
+		// FPS counter
+		Uint64 end = SDL_GetPerformanceCounter();
+		double elapsed = (end - start) / double(SDL_GetPerformanceFrequency());
+		int FPS = 1 / elapsed;
+		// std::cout << "FPS is " << FPS << std::endl;
 	}
 	// Cleanup
 	SDL_FreeSurface(winSurface);
