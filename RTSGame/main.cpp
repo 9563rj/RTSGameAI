@@ -104,7 +104,7 @@ int main(int argc, char** args)
 	Uint64 unitMoveTimer = SDL_GetTicks64() % unitMoveInterval;
 
 	// Init AI acting timer
-	int aiActInterval = 1000;
+	int aiActInterval = 300;
 	Uint64 aiActTimer = SDL_GetTicks64() % aiActInterval;
 
 	int playerlimit = 15;
@@ -139,6 +139,7 @@ int main(int argc, char** args)
 						int row = mousey / tilesize;
 						int column = mousex / tilesize;
 						if(currentunit != NULL) currentunit->buildFactory(units, tiles, factories, winSurface, window, 1);
+						currentunit = NULL;
 						break;
 					}
 					case(SDLK_b):
@@ -149,6 +150,7 @@ int main(int argc, char** args)
 						int row = mousey / tilesize;
 						int column = mousex / tilesize;
 						if (currentunit != NULL) currentunit->buildFactory(units, tiles, factories, winSurface, window, 2);
+						currentunit = NULL;
 						break;
 					}
 					case(SDLK_m):
@@ -159,6 +161,7 @@ int main(int argc, char** args)
 						int row = mousey / tilesize;
 						int column = mousex / tilesize;
 						if (currentunit != NULL) currentunit->buildFactory(units, tiles, factories, winSurface, window, 3);
+						currentunit = NULL;
 						break;
 					}
 				}

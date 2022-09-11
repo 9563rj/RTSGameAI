@@ -105,7 +105,7 @@ void unit::buildFactory(std::list<unit*>& units, std::vector<std::vector<tile*>>
 		bool belowClear = true;
 		int yUp = this->tileAt_->y_ - 1;
 		int ySame = this->tileAt_->y_;
-		int yDown = this->tileAt_->y_ - 1;
+		int yDown = this->tileAt_->y_ + 1;
 		int xSame = this->tileAt_->x_;
 		int xLeft = xSame - 1;
 		int xRight = xSame + 1;

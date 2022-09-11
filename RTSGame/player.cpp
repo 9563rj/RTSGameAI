@@ -102,42 +102,46 @@ void player::act(std::list<unit*>& units, std::list<tile*>& factories, std::vect
 			}
 			else if ((*it)->type_ == 3)
 			{
-				std::list<tile*> resourceTiles;
-				for (std::vector<std::vector<tile*>>::iterator rowit = tiles.begin(); rowit != tiles.end(); rowit++)
+				if ((*it)->tileAt_->state_ != 2)
 				{
-					for (std::vector<tile*>::iterator columnit = rowit->begin(); columnit != rowit->end(); columnit++)
+					std::list<tile*> resourceTiles;
+					for (std::vector<std::vector<tile*>>::iterator rowit = tiles.begin(); rowit != tiles.end(); rowit++)
 					{
-						if ((*columnit)->state_ == 2 && (*columnit)->unitAt_ == NULL)
+						for (std::vector<tile*>::iterator columnit = rowit->begin(); columnit != rowit->end(); columnit++)
 						{
-							resourceTiles.push_back(*columnit);
+							if ((*columnit)->state_ == 2 && (*columnit)->unitAt_ == NULL)
+							{
+								resourceTiles.push_back(*columnit);
+							}
 						}
 					}
-				}
-				if (resourceTiles.size() > 0)
-				{
-					//std::cout << resourceTiles.size() << " valid resources found" << std::endl;
-					std::vector<int> pathCosts;
-					std::vector<std::vector<tile*>> paths;
-					for (std::list<tile*>::iterator resourceit = resourceTiles.begin(); resourceit != resourceTiles.end(); resourceit++)
+					if (resourceTiles.size() > 0)
 					{
-						std::vector<tile*> path = astar(winSurface, window, tiles, units, (*it)->tileAt_, *resourceit);
-						if (path.size() == 0)
+						//std::cout << resourceTiles.size() << " valid resources found" << std::endl;
+						std::vector<int> pathCosts;
+						std::vector<std::vector<tile*>> paths;
+						for (std::list<tile*>::iterator resourceit = resourceTiles.begin(); resourceit != resourceTiles.end(); resourceit++)
 						{
-							//std::cout << "Invalid AI miner path: empty" << std::endl;
+							std::vector<tile*> path = astar(winSurface, window, tiles, units, (*it)->tileAt_, *resourceit);
+							if (path.size() == 0)
+							{
+								//std::cout << "Invalid AI miner path: empty" << std::endl;
+							}
+							else
+							{
+								paths.push_back(path);
+								pathCosts.push_back(path.size());
+							}
 						}
-						else
-						{
-							paths.push_back(path);
-							pathCosts.push_back(path.size());
-						}
+						std::vector<int>::iterator lowestPathCostIt = min_element(pathCosts.begin(), pathCosts.end());
+						int pathIndex = lowestPathCostIt - pathCosts.begin();
+						//std::cout << "There are " << pathCosts.size() << " path costs." << std::endl;
+						//std::cout << "There are " << paths.size() << " paths." << std::endl;
+						//std::cout << "Attempting to access index " << pathIndex << std::endl;
+						if (pathCosts.size() > 0) (*it)->navigate(tiles, units, paths[pathIndex].back(), winSurface, window); // Must be at least one valid path to navigate 
 					}
-					std::vector<int>::iterator lowestPathCostIt = min_element(pathCosts.begin(), pathCosts.end());
-					int pathIndex = lowestPathCostIt - pathCosts.begin();
-					//std::cout << "There are " << pathCosts.size() << " path costs." << std::endl;
-					//std::cout << "There are " << paths.size() << " paths." << std::endl;
-					//std::cout << "Attempting to access index " << pathIndex << std::endl;
- 					if (pathCosts.size() > 0) (*it)->navigate(tiles, units, paths[pathIndex].back(), winSurface, window); // Must be at least one valid path to navigate 
 				}
+				// otherwise don't move
 			}
 			else (*it)->navigate(tiles, units, tiles[row][column], winSurface, window);
 		}
