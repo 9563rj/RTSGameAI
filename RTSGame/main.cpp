@@ -180,7 +180,7 @@ int main(int argc, char** args)
 					if (row < 0) break;
 					if (column < 0) break;
 					bool cont = true;
-				if (currentunit == NULL) 
+					if (currentunit == NULL) 
 					{
 						/*int mousex; deprecated, we don't want a new player on left click
 						int mousey;
@@ -201,11 +201,13 @@ int main(int argc, char** args)
 							cont = false;
 						}
 					}
-					if (cont)
+
+					if (cont) // Only if currentunit is valid, then attempt to set a new path for currentunit
 					{
 						targr = row;
 						targc = column;
-						if (tiles[row][column]->state_ != 1 && tiles[row][column]->state_ != 3)
+
+						if (tiles[row][column]->state_ != 1 && tiles[row][column]->state_ != 3 && tiles[row][column]->magicflag == 62)
 						{
 							for (int r = 0; r < tiles.size(); r++)
 							{
@@ -217,6 +219,10 @@ int main(int argc, char** args)
 							// std::cout << "setting new goal to r=" << row << " and c=" << column << std::endl;
 							// tiles[row][column]->state_ = 3;
 							currentunit->navigate(tiles, units, tiles[row][column], winSurface, window);
+						}
+						else if (tiles[row][column]->magicflag != 62)
+						{
+							std::cout << "attempting to read data from a nonexistent tile" << std::endl;
 						}
 					}
 				}
@@ -381,6 +387,7 @@ int main(int argc, char** args)
 		// Kill units that died during this frame, avoids modifying actively iterated lists
 		for (auto deadPtr : deadUnits)
 		{
+			if (deadPtr == currentunit) currentunit = NULL;
 			player* deadPtrTeam = deadPtr->team_;
 			std::list<unit*>::iterator deadUnit = std::find(deadPtrTeam->units_.begin(), deadPtrTeam->units_.end(), deadPtr);
 			// check if dead unit is in its team's unit list

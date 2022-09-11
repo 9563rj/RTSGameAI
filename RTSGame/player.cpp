@@ -2,8 +2,10 @@
 #include "tile.h"
 #include "unit.h"
 #include "buildfactory.h"
+#include "main.h"
 #include <random>
 
+auto gen = std::mt19937{ std::random_device{}() };
 
 player::player(int team, SDL_Surface& winSurface, bool human)
 {
@@ -79,12 +81,116 @@ Uint32 player::teamColor(int team, SDL_Surface &winSurface)
 	exit(1);*/
 }
 
+enum moveTypes {moveFighter, moveBuilder, buildFactory, moveMiner};
+
 void player::act(std::list<unit*>& units, std::list<tile*>& factories, std::vector<std::vector<tile*>>& tiles, SDL_Surface* winSurface, SDL_Window* window)
 {
 	switch (strat_) 
 	{
 	case(random):
 		double r = rand() / double(RAND_MAX);
+		// Possible moves are:
+		// Move fighter (randomly): if this team has a fighter, if there is a valid destination
+		// Move builder (randomly): if this team has a builder, if there is a valid destination
+		// Builder builds factory: if there are not more factories than 2x active miners and valid builder to build a factory
+		// Miner moves to resource: if there is a valid miner and a valid resource
+		std::list<unit*> fighters;
+		std::list<unit*> builders;
+		std::list<unit*> miners;
+		std::list<unit*> activeMiners;
+		std::list<tile*> openTiles;
+		std::list<tile*> openResources;
+		std::list<tile*> teamFactories;
+		for (auto unitPtr : units_)
+		{
+			if (unitPtr->type_ == 1) fighters.push_back(unitPtr);
+			if (unitPtr->type_ == 2) builders.push_back(unitPtr);
+			if (unitPtr->type_ == 3) miners.push_back(unitPtr);
+			if (unitPtr->type_ == 3 && unitPtr->tileAt_->state_ == 2) activeMiners.push_back(unitPtr);
+		}
+		for (std::vector<std::vector<tile*>>::iterator tilesRowIt = tiles.begin(); tilesRowIt != tiles.end(); tilesRowIt++)
+		{
+			for (std::vector<tile*>::iterator tilesColIt = (*tilesRowIt).begin(); tilesColIt != (*tilesRowIt).end(); tilesColIt++)
+			{
+				if (((*tilesColIt)->state_ == 0 || (*tilesColIt)->state_ == 2) && (*tilesColIt)->unitAt_ == NULL) openTiles.push_back(*tilesColIt);
+				if ((*tilesColIt)->claimedBy_ == this) teamFactories.push_back(*tilesColIt);
+				if ((*tilesColIt)->state_ == 2 && (*tilesColIt)->unitAt_ == NULL) openResources.push_back(*tilesColIt);
+			}
+		}
+
+		bool canMoveFighter = fighters.size() > 0 && openTiles.size() > 0;
+		bool canMoveBuilder = builders.size() > 0 && openTiles.size() > 0;
+		bool canBuildFactory = builders.size() > 0 && (teamFactories.size() * 2) < activeMiners.size();
+		bool canMoveMiner = miners.size() > 0 && miners.size() > activeMiners.size() && openResources.size() > 0;
+
+		int numValidMoves = 0;
+		if (canMoveFighter) numValidMoves++;
+		if (canMoveBuilder) numValidMoves++;
+		if (canBuildFactory) numValidMoves++;
+		if (canMoveMiner) numValidMoves++;
+		std::uniform_int_distribution<> factoryTypeDistrib(1, 3);
+
+PICK_A_MOVE:
+		std::uniform_int_distribution<> distrib(0, 3);
+		int movePicker = distrib(gen);
+		switch (movePicker) 
+		{
+		case(moveFighter):
+			if (canMoveFighter)
+			{
+				std::list<unit*> pickedFighter;
+				std::list<tile*> pickedTile;
+				std::sample(fighters.begin(), fighters.end(), std::back_inserter(pickedFighter), 1, gen);
+				std::sample(openTiles.begin(), openTiles.end(), std::back_inserter(pickedTile), 1, gen);
+				if(pickedFighter.size() > 0 && pickedTile.size() > 0) pickedFighter.back()->navigate(tiles, units, pickedTile.back(), winSurface, window);
+				if (pickedFighter.size() == 0) std::cout << "Could not pick a fighter when trying to move fighter" << std::endl;
+				if (pickedTile.size() == 0) std::cout << "Could not pick a tile when trying to move fighter" << std::endl;
+			}
+			else goto PICK_A_MOVE;
+			break;
+		case(moveBuilder):
+			if (canMoveBuilder)
+			{
+				std::list<unit*> pickedBuilder;
+				std::list<tile*> pickedTile;
+				std::sample(builders.begin(), builders.end(), std::back_inserter(pickedBuilder), 1, gen);
+				std::sample(openTiles.begin(), openTiles.end(), std::back_inserter(pickedTile), 1, gen);
+				if(pickedBuilder.size() > 0 && pickedTile.size() > 0) pickedBuilder.back()->navigate(tiles, units, pickedTile.back(), winSurface, window);
+				if (pickedBuilder.size() == 0) std::cout << "Could not pick a builder while trying to move builder" << std::endl;
+				if (pickedTile.size() == 0) std::cout << "Could not pick a tile while trying to move builder" << std::endl;
+			}
+			else goto PICK_A_MOVE;
+			break;
+		case(buildFactory):
+			if (canBuildFactory)
+			{
+				std::list<unit*> pickedBuilder;
+				std::sample(builders.begin(), builders.end(), std::back_inserter(pickedBuilder), 1, gen);
+				int factoryType = factoryTypeDistrib(gen);
+				if(pickedBuilder.size()>0) pickedBuilder.back()->buildFactory(units, tiles, factories, winSurface, window, factoryType);
+				if (pickedBuilder.size() == 0) std::cout << "Could not pick a builder while trying to build factory" << std::endl;
+			}
+			else goto PICK_A_MOVE;
+			break;
+		case(moveMiner):
+			if (canMoveMiner)
+			{
+				std::list<unit*> pickedMiner;
+				std::list<tile*> pickedOpenResource;
+				std::sample(miners.begin(), miners.end(), std::back_inserter(pickedMiner), 1, gen);
+				std::sample(openResources.begin(), openResources.end(), std::back_inserter(pickedOpenResource), 1, gen);
+				if(pickedMiner.size() > 0 && pickedOpenResource.size() > 0) pickedMiner.back()->navigate(tiles, units, pickedOpenResource.back(), winSurface, window);
+				if (pickedMiner.size() == 0) std::cout << "Could not pick a miner while trying to move miner" << std::endl;
+				if (pickedOpenResource.size() == 0) std::cout << "Could not pick an open resource while trying to move miner" << std::endl;
+			}
+		}
+		if (units_.size() == 1)
+		{
+			unit* unitPtr = units_.back();
+			if (unitPtr->type_ == 0) unitPtr->buildFactory(units, tiles, factories, winSurface, window, 2);
+		}
+
+		/*
 		if (r < .8)
 		{
 			//std::cout << "Decided to move, picker was " << r << std::endl;
@@ -166,7 +272,7 @@ void player::act(std::list<unit*>& units, std::list<tile*>& factories, std::vect
 			std::cout << "Impossible selector value while trying to execute AI action" << std::endl;
 			std::system("pause");
 			exit(1);
-		}
+		}*/
 		break;
 	}
 }
