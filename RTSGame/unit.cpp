@@ -124,13 +124,16 @@ void unit::buildFactory(std::list<unit*>& units, std::vector<std::vector<tile*>>
 		if (tiles[ySame][xLeft]->state_ == 3) leftClear = false;
 		if (tiles[ySame][xRight]->state_ == 3) rightClear = false;
 		if (tiles[yDown][xSame]->state_ == 3) belowClear = false;
+		bool aboveNoWall = tiles[yUp][xSame]->state_ != 1;
+		bool rightNoWall = tiles[ySame][xRight]->state_ != 1;
+		bool belowNoWall = tiles[yDown][xSame]->state_ != 1;
 
 		if (aboveClear && leftClear && rightClear && belowClear)
 		{
 			// If main unit, this can only be a Builder Factory, also spawn Fighter, Builder, Miner
 			if (this->type_ == 0)
 			{
-				if (aboveClear && rightClear && belowClear)
+				if (aboveNoWall && rightNoWall && belowNoWall)
 				{
 					if ((this->type_ == 0 || this->type_ == 2) && this->tileAt_->state_ == 0)
 					{

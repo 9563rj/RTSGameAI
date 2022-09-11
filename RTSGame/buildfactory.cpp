@@ -4,6 +4,8 @@
 #include "unit.h"
 #include "utils.h"
 
+// Deprecated, now a method of unit
+
 /*void buildFactory(int row, int column, std::list<unit*>& units, std::vector<std::vector<tile*>>& tiles, std::list<tile*>& factories, unit* currentunit, SDL_Surface* winSurface, SDL_Window* window, int factoryTypeSelector)
 {
 	if (units.size() > 0)
