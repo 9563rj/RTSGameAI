@@ -321,11 +321,9 @@ int updateState(std::vector<player*>& players, unit* currentunit, std::list<unit
         }
         for (auto playerPtr : deadPlayers)
         {
-                printf("deleting player %d\n",playerPtr->team_id_);
                 // deleting dead player
                 delete playerPtr;
                 players.erase(std::find(players.begin(), players.end(), playerPtr));
-                printf("after erase, %lu players left\n",players.size());
         }
 
         if (players.size() == 1)
@@ -410,7 +408,7 @@ int runMatch(std::vector<player*>& players, SDL_Surface* winSurface, SDL_Window*
 	bool gameRunning = true;
 	SDL_Event event;
 
-        int winner = -1;
+        int winner_id = 0;
         
 	// Main game loop
 	while (gameRunning)
@@ -436,12 +434,12 @@ int runMatch(std::vector<player*>& players, SDL_Surface* winSurface, SDL_Window*
 			}
 		}
 
-                winner = updateState(players, currentunit, units, tiles,
-                                     factories, winSurface, window);
+                winner_id = updateState(players, currentunit, units, tiles,
+                                        factories, winSurface, window);
 
 		drawMap(winSurface, window, tiles, units, players);
 
-                if (winner) goto gameover;
+                if (winner_id) goto gameover;
                 
 		// FPS counter
 		// Uint64 end = SDL_GetPerformanceCounter();
@@ -453,7 +451,7 @@ int runMatch(std::vector<player*>& players, SDL_Surface* winSurface, SDL_Window*
 gameover:
         std::cout << "Game Over" << std::endl;
 
-        return winner;
+        return winner_id;
 }
 
 int main(int argc, char** args)
@@ -496,7 +494,7 @@ int main(int argc, char** args)
                         int winner_id = runMatch(players, winSurface, window);
                         printf("%d wins match %d/%d\n",winner_id,n+1,N);
 
-                        delete players[winner_id-1];
+                        if (winner_id) delete players[winner_id-1];
                 }
         }
 
