@@ -143,14 +143,14 @@ void handle_mouseup(Uint8 button, std::vector<player*>& players,
         {
             // std::cout << "Creating human player" << std::endl;
             players.push_back(new player(players.size(), *winSurface, true));
-            units.push_back(new unit(players.back(), tiles, 0, row, column));
+            units.push_back(new unit(players.back(), tiles, mainunit, row, column));
             currentunit = units.back();
         }
         else if (players.size() < playerlimit)
         {
             // std::cout << "Creating AI player" << std::endl;
             players.push_back(new player(players.size(), *winSurface, false));
-            units.push_back(new unit(players.back(), tiles, 0, row, column));
+            units.push_back(new unit(players.back(), tiles, mainunit, row, column));
         }
         else
         {
@@ -272,7 +272,7 @@ int updateState(std::vector<player*>& players, unit* currentunit, std::list<unit
                                         if (alreadyDeadCheck)
                                         {
                                                 targetPtr->claimedBy_ = NULL;
-                                                targetPtr->factoryType = 0;
+                                                targetPtr->factoryType = mainunit;
                                                 targetPtr->state_ = 0;
                                                 it = factories.erase(std::find(factories.begin(), factories.end(), targetPtr));
                                                 if (it == factories.end()) break;
@@ -418,8 +418,8 @@ int runMatch(std::vector<player*>& players, SDL_Surface* winSurface, SDL_Window*
         int row1 = maxr-row0;
         int col1 = maxc-col0;
 
-        units.push_back(new unit(players[0], tiles, 0, row0, col0));
-        units.push_back(new unit(players[1], tiles, 0, row1, col1));
+        units.push_back(new unit(players[0], tiles, mainunit, row0, col0));
+        units.push_back(new unit(players[1], tiles, mainunit, row1, col1));
 
 	// Create unit, initialize, create path variable
 	
@@ -513,7 +513,7 @@ int main(int argc, char** args)
         players.push_back(new player(1, *winSurface, false));
 
         // Run tournament
-        int N = 2;
+        int N = 10;
         for (int n = 0; n < N; n++) {
 
                 printf("Running match %d/%d\n",n+1,N);

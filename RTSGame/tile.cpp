@@ -11,7 +11,7 @@ tile::tile(const int& state, int& x, int& y)
 	onpath = false;
 	claimedBy_ = NULL;
 	unitAt_ = NULL;
-	factoryType = 0;
+	factoryType = mainunit;
 	x_ = x;
 	y_ = y;
 }

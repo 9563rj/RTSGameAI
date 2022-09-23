@@ -4,7 +4,7 @@
 #include "player.h"
 #include "utils.h"
 
-unit::unit(player* team, const std::vector<std::vector<tile*>>& tiles, const int type, const int row, const int column)
+unit::unit(player* team, const std::vector<std::vector<tile*>>& tiles, const UnitType type, const int row, const int column)
 {
 	tileAt_ = tiles[row][column];
 	type_ = type;
@@ -14,16 +14,16 @@ unit::unit(player* team, const std::vector<std::vector<tile*>>& tiles, const int
 	unitMoveFlag = true;
 	switch (type_)
 	{
-	case(0):
+	case(mainunit):
 		health_ = 10;
 		break;
-	case(1):
+	case(fighter):
 		health_ = 50;
 		break;
-	case(2):
+	case(builder):
 		health_ = 10;
 		break;
-	case(3):
+	case(miner):
 		health_ = 100;
 		break;
 	}
@@ -64,7 +64,7 @@ void unit::advance(std::vector<std::vector<tile*>>& tiles)
 		}
 
 	}
-	else if (tileAt_->state_ == 2 && resourceMineFlag && team_->resources_ < team_->maxResources_ && type_ == 3)
+	else if (tileAt_->state_ == 2 && resourceMineFlag && team_->resources_ < team_->maxResources_ && type_ == miner)
 	{
 		team_->resources_++;
 		resourceMineFlag = false;
@@ -130,24 +130,24 @@ void unit::buildFactory(std::list<unit*>& units, std::vector<std::vector<tile*>>
 		if (aboveClear && leftClear && rightClear && belowClear)
 		{
 			// If main unit, this can only be a Builder Factory, also spawn Fighter, Builder, Miner
-			if (this->type_ == 0)
+			if (this->type_ == mainunit)
 			{
 				if (aboveNoWall && rightNoWall && belowNoWall)
 				{
-					if ((this->type_ == 0 || this->type_ == 2) && this->tileAt_->state_ == 0)
+					if ((this->type_ == mainunit || this->type_ == builder) && this->tileAt_->state_ == 0)
 					{
 						// Set this tile to be a factory tile and add it to the list of factory tiles
 						this->tileAt_->claimedBy_ = this->team_;
 						this->tileAt_->state_ = 3;
-						this->tileAt_->factoryType = 2;
+						this->tileAt_->factoryType = builder;
 						factories.push_back(this->tileAt_);
 
 						// Create fighter, builder, and miner and add to relevant lists
-						units.push_back(new unit(this->team_, tiles, 1, tileAt_->y_ - 1, tileAt_->x_));
+						units.push_back(new unit(this->team_, tiles, fighter, tileAt_->y_ - 1, tileAt_->x_));
 						//this->team_->units_.push_back(units.back());
-						units.push_back(new unit(this->team_, tiles, 2, tileAt_->y_, tileAt_->x_ + 1));
+						units.push_back(new unit(this->team_, tiles, builder, tileAt_->y_, tileAt_->x_ + 1));
 						//this->team_->units_.push_back(units.back());
-						units.push_back(new unit(this->team_, tiles, 3, tileAt_->y_ + 1, tileAt_->x_));
+						units.push_back(new unit(this->team_, tiles, miner, tileAt_->y_ + 1, tileAt_->x_));
 						//this->team_->units_.push_back(units.back());
 
 						// Erase from list of units held by this unit's team
@@ -163,14 +163,14 @@ void unit::buildFactory(std::list<unit*>& units, std::vector<std::vector<tile*>>
 					}
 				}
 			}
-			else if (this->type_ == 2)
+			else if (this->type_ == builder)
 			{
-				if ((this->type_ == 0 || this->type_ == 2) && this->tileAt_->state_ == 0)
+				if ((this->type_ == mainunit || this->type_ == builder) && this->tileAt_->state_ == 0)
 				{
 					// Set this tile to be a factory tile and add it to the list of factory tiles
 					this->tileAt_->claimedBy_ = this->team_;
 					this->tileAt_->state_ = 3;
-					this->tileAt_->factoryType = factoryTypeSelector;
+					this->tileAt_->factoryType = UnitType(factoryTypeSelector);
 					factories.push_back(this->tileAt_);
 
 					// Erase from list of units held by this unit's team
