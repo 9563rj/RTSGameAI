@@ -19,6 +19,7 @@ void drawMap(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vecto
 			drawRect.x = boardlox +i*tilesize;
 			drawRect.y = boardloy +j*tilesize;
 			SDL_FillRect(winSurface, &drawRect, tiles[j][i]->getColor(*winSurface));
+                        
 			switch (tiles[j][i]->factoryType) 
 			{
 			case(0): // Main Unit Factory

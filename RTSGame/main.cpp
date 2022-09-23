@@ -340,7 +340,7 @@ int updateState(std::vector<player*>& players, unit* currentunit, std::list<unit
         return 0; // no winner
 }
 
-int initSDL(SDL_Surface*& winSurface, SDL_Window*& window)
+int initSDL(SDL_Surface*& winSurface, SDL_Window*& window, int winx, int winy)
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
 	{
@@ -348,8 +348,7 @@ int initSDL(SDL_Surface*& winSurface, SDL_Window*& window)
 		std::system("pause");
 		return 1;
 	}
-	int winx = 1600;
-	int winy = 900;
+
 	window = SDL_CreateWindow("RTSGame", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, winx, winy, SDL_WINDOW_SHOWN);
 	if (!window) 
 	{
@@ -465,7 +464,22 @@ int main(int argc, char** args)
 	SDL_Surface* winSurface = NULL;
 	SDL_Window* window = NULL;
 
-        int err = initSDL(winSurface, window);
+        // read map so we can get dimensions for window
+        int winw,winh;
+        {
+                std::vector<std::vector<tile*>> tiles;
+                initMap(tiles, false, false);
+                int maxr = tiles.size();
+                int maxc = tiles[0].size();
+
+                const int boardlox = 100+2*tilesize;
+                const int boardloy = 0;
+                
+                winw = boardlox+maxc*tilesize;
+                winh = boardloy+maxr*tilesize;
+        }
+        
+        int err = initSDL(winSurface, window, winw, winh);
         if (err) exit(err);
 
         // AI vs AI
