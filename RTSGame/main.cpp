@@ -405,7 +405,6 @@ int runMatch(std::vector<player*>& players, SDL_Surface* winSurface, SDL_Window*
 
 	// Create unit, initialize, create path variable
 	
-	std::vector<tile*> path;
 	unit* currentunit = NULL;
 
 	// Create list of factories, so that not every tile has to be searched for spawning loop
@@ -469,7 +468,7 @@ int main(int argc, char** args)
         int err = initSDL(winSurface, window);
         if (err) exit(err);
 
-        // 1 vs 1
+        // AI vs AI
 	std::vector<player*> players;
         players.push_back(new player(0, *winSurface, false));
         players.push_back(new player(1, *winSurface, false));
