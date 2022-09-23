@@ -321,26 +321,17 @@ int updateState(std::vector<player*>& players, unit* currentunit, std::list<unit
         }
         for (auto playerPtr : deadPlayers)
         {
+                printf("deleting player %d\n",playerPtr->team_id_);
                 // deleting dead player
                 delete playerPtr;
                 players.erase(std::find(players.begin(), players.end(), playerPtr));
+                printf("after erase, %lu players left\n",players.size());
         }
 
         if (players.size() == 1)
         {
-                for (auto playerPtr : players)
-                {
-                        bool hasNoFactories = true;
-                        for (auto factoryPtr : factories)
-                        {
-                                if (factoryPtr->claimedBy_ == playerPtr) hasNoFactories = false;
-                        }
-                        if (playerPtr->units_.size() != 0 && !hasNoFactories)
-                        {
-                                std::cout << "Player " << playerPtr->team_id_ << " with color " << playerPtr->color_ << " wins!" << std::endl;
-                                return playerPtr->team_id_;
-                        }
-                }
+                printf("** player %d wins! **\n",players[0]->team_id_);
+                return players[0]->team_id_;
         }
 
         return 0; // no winner
@@ -494,7 +485,7 @@ int main(int argc, char** args)
         players.push_back(new player(1, *winSurface, false));
 
         // Run tournament
-        int N = 2;
+        int N = 1;
         for (int n = 0; n < N; n++) {
 
                 {
