@@ -307,17 +307,23 @@ int updateState(std::vector<player*>& players, unit* currentunit, std::list<unit
                 bool hasNoFactories = true;
                 for (auto factoryPtr : factories)
                 {
-                        if (factoryPtr->claimedBy_ == playerPtr) hasNoFactories = false;
+                        if (factoryPtr->claimedBy_ == playerPtr) {
+                                hasNoFactories = false;
+                                break;
+                        }
                 }
-                if (playerPtr->units_.size() == 0 && hasNoFactories)
+                bool hasNoUnits = !playerPtr->units_.size();
+                if (hasNoUnits && hasNoFactories)
                 {
+                        printf("player %d is dead\n",playerPtr->team_id_);
                         deadPlayers.push_back(playerPtr);
                 }
         }
         for (auto playerPtr : deadPlayers)
         {
-                players.erase(std::find(players.begin(), players.end(), playerPtr));
+                // deleting dead player
                 delete playerPtr;
+                players.erase(std::find(players.begin(), players.end(), playerPtr));
         }
 
         if (players.size() == 1)
@@ -496,11 +502,10 @@ int main(int argc, char** args)
                         players.push_back(new player(0, *winSurface, false));
                         players.push_back(new player(1, *winSurface, false));
                         
-                        int winner = runMatch(players, winSurface, window);
-                        printf("%d wins match %d/%d\n",winner,n+1,N);
+                        int winner_id = runMatch(players, winSurface, window);
+                        printf("%d wins match %d/%d\n",winner_id,n+1,N);
 
-                        delete players[0];
-                        delete players[1];
+                        delete players[winner_id-1];
                 }
         }
 
