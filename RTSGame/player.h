@@ -6,6 +6,7 @@ enum Strategy { rng, turtle, balanced, aggro };
 struct player // Parallel definitions in unit.cpp, tile.cpp, player.h
 {
 	bool human_;
+        int team_id_;
 	player(int team, SDL_Surface &winSurface, bool human);
 	Uint32 teamColor(int team, SDL_Surface &winSurface);
 	Strategy strat_;
