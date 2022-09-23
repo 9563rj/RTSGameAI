@@ -60,7 +60,7 @@ void unit::advance(std::vector<std::vector<tile*>>& tiles)
 		else
 		{
 			path_.clear();
-			std::cout << "Unit " << this << " was blocked at " << tileAt_->x_ << ", " << tileAt_->y_ << std::endl;
+			//std::cout << "Unit " << this << " was blocked at " << tileAt_->x_ << ", " << tileAt_->y_ << std::endl;
 		}
 
 	}

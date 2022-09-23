@@ -393,31 +393,31 @@ int runMatch(std::vector<player*>& players, SDL_Surface* winSurface, SDL_Window*
 	std::vector<std::vector<tile*>> tiles;
 	initMap(tiles, false, false);
 
-        maxr = tiles.size();
-        maxc = tiles[0].size();
-        printf("maxr = %d\n",maxr);
-        printf("maxc = %d\n",maxc);
-        
 	std::list<unit*> units;
 
         // Each player starts with 1 unit
+
+        int nr = tiles.size();
+        int nc = tiles[0].size();
+        
+        maxr = nr-1;
+        maxc = nc-1;
+        
         double ra = rand()/double(RAND_MAX);
         double rb = rand()/double(RAND_MAX);
 
-        int maxr0 = maxr/2;
-        int minr0 = 1;
+        int maxr0 = maxr-2;
+        int minr0 = 2;
 
-        int maxc0 = maxc/2;
-        int minc0 = 1;
+        int maxc0 = maxc/2-2;
+        int minc0 = 2;
         
-        int row0 = minr0 +ra*maxr0;
-        int col0 = minc0 +rb*maxc0;
+        int row0 = minr0 +ra*(maxr0-minr0);
+        int col0 = minc0 +rb*(maxc0-minc0);
         
-        int row1 = maxr-row0-1;
-        int col1 = maxc-col0-1;
+        int row1 = maxr-row0;
+        int col1 = maxc-col0;
 
-        printf("(%d,%d) for player 0\n",row0,col0);
-        printf("(%d,%d) for player 1\n",row1,col1);
         units.push_back(new unit(players[0], tiles, 0, row0, col0));
         units.push_back(new unit(players[1], tiles, 0, row1, col1));
 
@@ -484,6 +484,8 @@ gameover:
 
 int main(int argc, char** args)
 {
+        
+        
 	SDL_Surface* winSurface = NULL;
 	SDL_Window* window = NULL;
 
@@ -511,9 +513,10 @@ int main(int argc, char** args)
         players.push_back(new player(1, *winSurface, false));
 
         // Run tournament
-        int N = 1;
+        int N = 2;
         for (int n = 0; n < N; n++) {
 
+                printf("Running match %d/%d\n",n+1,N);
                 {
                         std::vector<player*> players;
                         players.push_back(new player(0, *winSurface, false));
