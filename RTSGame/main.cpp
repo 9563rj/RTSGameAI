@@ -291,12 +291,12 @@ int main(int argc, char** args)
 			unitSpawnTimer = SDL_GetTicks() % unitSpawnInterval;
 		}
 
-		for (auto factory : factories)
-		{
-			if (unitSpawnTimerDone)
-			{
-				factory->spawnUnit(tiles, units, window, winSurface);
-			}
+                if (unitSpawnTimerDone)
+                {
+                        for (auto factory : factories)
+                        {
+                                factory->spawnUnit(tiles, units, window, winSurface);
+                        }
 		}
 
 		bool unitMoveTimerDone = false;
