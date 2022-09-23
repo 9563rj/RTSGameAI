@@ -7,8 +7,144 @@
 #include "buildfactory.h"
 
 const int tilesize = 25;
+const int playerlimit = 15;
 
+bool handle_keydown(SDL_Keycode& key, std::vector<player*>& players, unit* currentunit, std::list<unit*>& units, std::vector<std::vector<tile*>>& tiles, std::list<tile*>& factories, SDL_Surface* winSurface, SDL_Window* window)
+{
+	switch (key)
+	{
+	case(SDLK_ESCAPE):
+		return false;
+	case(SDLK_r):
+		for (int i = 0; i < players.size(); i++)
+		{
+			std::cout << "Player " << i << " has " << players[i]->resources_ << " resources." << std::endl;
+		}
+		break;
+	case(SDLK_f):
+	{
+		int mousex;
+		int mousey;
+		SDL_GetMouseState(&mousex, &mousey);
+		int row = mousey / tilesize;
+		int column = mousex / tilesize;
+		if(currentunit != NULL) currentunit->buildFactory(units, tiles, factories, winSurface, window, 1);
+		currentunit = NULL;
+		break;
+	}
+	case(SDLK_b):
+	{
+		int mousex;
+		int mousey;
+		SDL_GetMouseState(&mousex, &mousey);
+		int row = mousey / tilesize;
+		int column = mousex / tilesize;
+		if (currentunit != NULL) currentunit->buildFactory(units, tiles, factories, winSurface, window, 2);
+		currentunit = NULL;
+		break;
+	}
+	case(SDLK_m):
+	{
+		int mousex;
+		int mousey;
+		SDL_GetMouseState(&mousex, &mousey);
+		int row = mousey / tilesize;
+		int column = mousex / tilesize;
+		if (currentunit != NULL) currentunit->buildFactory(units, tiles, factories, winSurface, window, 3);
+		currentunit = NULL;
+		break;
+	}
+	}
 
+        return true;
+}
+
+void handle_mouseup(Uint8 button, std::vector<player*>& players, unit* currentunit, std::list<unit*>& units, std::vector<std::vector<tile*>>& tiles, SDL_Surface* winSurface, SDL_Window* window)
+{
+    if (button == SDL_BUTTON_LEFT)
+    {
+        // On left click, tell player to move to clicked tile
+        int mousex;
+        int mousey;
+        SDL_GetMouseState(&mousex, &mousey);
+        int row = mousey / tilesize;
+        int column = mousex / tilesize;
+
+        // Ignore clicks outside the board
+        if (row >= tiles.size()) return;
+        if (column >= tiles[0].size()) return;
+        if (row < 0) return;
+        if (column < 0) return;
+
+        bool cont = true;
+        for (auto unit : units)
+        {
+            if (unit->tileAt_->y_ == row && unit->tileAt_->x_ == column && unit->team_->human_)
+            {
+                currentunit = unit;
+                cont = false;
+            }
+        }
+
+        if (cont) // Only if currentunit is valid, then attempt to set a new path for currentunit
+        {
+            int targr = row;
+            int targc = column;
+
+            if (tiles[row][column]->state_ != 1 && tiles[row][column]->state_ != 3 && tiles[row][column]->magicflag == 62)
+            {
+                for (int r = 0; r < tiles.size(); r++)
+                {
+                    for (int c = 0; c < tiles[0].size(); c++)
+                    {
+                        tiles[r][c]->onpath = false;
+                    }
+                }
+                // std::cout << "setting new goal to r=" << row << " and c=" << column << std::endl;
+                // tiles[row][column]->state_ = 3;
+                currentunit->navigate(tiles, units, tiles[row][column], winSurface, window);
+            }
+            else if (tiles[row][column]->magicflag != 62)
+            {
+                std::cout << "attempting to read data from a nonexistent tile" << std::endl;
+            }
+        }
+    }
+    else if (button == SDL_BUTTON_RIGHT)
+    {
+        // On right click, create new player at tile
+        int mousex;
+        int mousey;
+        SDL_GetMouseState(&mousex, &mousey);
+        int row = mousey / tilesize;
+        int column = mousex / tilesize;
+        if (players.size() == 0)
+        {
+            // std::cout << "Creating human player" << std::endl;
+            players.push_back(new player(players.size(), *winSurface, true));
+            units.push_back(new unit(players.back(), tiles, 0, row, column, window, winSurface));
+            currentunit = units.back();
+        }
+        else if (players.size() < playerlimit)
+        {
+            // std::cout << "Creating AI player" << std::endl;
+            players.push_back(new player(players.size(), *winSurface, false));
+            units.push_back(new unit(players.back(), tiles, 0, row, column, window, winSurface));
+        }
+        else
+        {
+            std::cout << "Exceeded player limit, which is " << playerlimit << std::endl;
+            std::system("pause");
+            exit(1);
+        }
+        players.back()->units_.push_back(units.back());
+    }
+    else if (button == SDL_BUTTON_MIDDLE)
+    {
+        // no-op
+    }
+}
+                    
 
 int main(int argc, char** args)
 {
@@ -107,159 +243,28 @@ int main(int argc, char** args)
 	int aiActInterval = 300;
 	Uint64 aiActTimer = SDL_GetTicks() % aiActInterval;
 
-	int playerlimit = 15;
 
 	// Main game loop
 	while (gameRunning)
 	{
 		Uint64 start = SDL_GetPerformanceCounter();
-		SDL_PollEvent(&event);
-		switch (event.type)
-		{
+		while (SDL_PollEvent(&event)) {
+
+			switch (event.type)
+			{
 			case(SDL_QUIT):
 				gameRunning = false;
 				break;
 			case(SDL_KEYDOWN):
-				switch (event.key.keysym.sym)
-				{
-					case(SDLK_ESCAPE):
-						gameRunning = false;
-						break;
-					case(SDLK_r):
-						for (int i = 0; i < players.size(); i++)
-						{
-							std::cout << "Player " << i << " has " << players[i]->resources_ << " resources." << std::endl;
-						}
-						break;
-					case(SDLK_f):
-					{
-						int mousex;
-						int mousey;
-						SDL_GetMouseState(&mousex, &mousey);
-						int row = mousey / tilesize;
-						int column = mousex / tilesize;
-						if(currentunit != NULL) currentunit->buildFactory(units, tiles, factories, winSurface, window, 1);
-						currentunit = NULL;
-						break;
-					}
-					case(SDLK_b):
-					{
-						int mousex;
-						int mousey;
-						SDL_GetMouseState(&mousex, &mousey);
-						int row = mousey / tilesize;
-						int column = mousex / tilesize;
-						if (currentunit != NULL) currentunit->buildFactory(units, tiles, factories, winSurface, window, 2);
-						currentunit = NULL;
-						break;
-					}
-					case(SDLK_m):
-					{
-						int mousex;
-						int mousey;
-						SDL_GetMouseState(&mousex, &mousey);
-						int row = mousey / tilesize;
-						int column = mousex / tilesize;
-						if (currentunit != NULL) currentunit->buildFactory(units, tiles, factories, winSurface, window, 3);
-						currentunit = NULL;
-						break;
-					}
-				}
-			case(SDL_MOUSEBUTTONUP):
-				if (event.button.button == SDL_BUTTON_LEFT)
-				{
-					// On left click, tell player to move to clicked tile
-					int mousex;
-					int mousey;
-					SDL_GetMouseState(&mousex, &mousey);
-					int row = mousey / tilesize;
-					int column = mousex / tilesize;
-					// Ignore clicks outside the board
-					if (row >= tiles.size()) break;
-					if (column >= tiles[0].size()) break;
-					if (row < 0) break;
-					if (column < 0) break;
-					bool cont = true;
-					if (currentunit == NULL) 
-					{
-						/*int mousex; deprecated, we don't want a new player on left click
-						int mousey;
-						SDL_GetMouseState(&mousex, &mousey);
-						int row = mousey / tilesize;
-						int column = mousex / tilesize;
-						players.push_back(new player(players.size(), *winSurface));
-						units.push_back(new unit(players.back(), tiles, 0, row, column, window, winSurface));
-						players.back()->commander_ = units.back();
-						players.back()->units_.push_back(units.back());*/
-						cont = false;
-					}
-					for (auto unit : units)
-					{
-						if (unit->tileAt_->y_ == row && unit->tileAt_->x_ == column && unit->team_->human_)
-						{
-							currentunit = unit;
-							cont = false;
-						}
-					}
-
-					if (cont) // Only if currentunit is valid, then attempt to set a new path for currentunit
-					{
-						targr = row;
-						targc = column;
-
-						if (tiles[row][column]->state_ != 1 && tiles[row][column]->state_ != 3 && tiles[row][column]->magicflag == 62)
-						{
-							for (int r = 0; r < tiles.size(); r++)
-							{
-								for (int c = 0; c < tiles[0].size(); c++)
-								{
-									tiles[r][c]->onpath = false;
-								}
-							}
-							// std::cout << "setting new goal to r=" << row << " and c=" << column << std::endl;
-							// tiles[row][column]->state_ = 3;
-							currentunit->navigate(tiles, units, tiles[row][column], winSurface, window);
-						}
-						else if (tiles[row][column]->magicflag != 62)
-						{
-							std::cout << "attempting to read data from a nonexistent tile" << std::endl;
-						}
-					}
-				}
-				else if (event.button.button == SDL_BUTTON_RIGHT)
-				{
-					// On right click, create new player at tile
-					int mousex;
-					int mousey;
-					SDL_GetMouseState(&mousex, &mousey);
-					int row = mousey / tilesize;
-					int column = mousex / tilesize;
-					if (players.size() == 0)
-					{
-						// std::cout << "Creating human player" << std::endl;
-						players.push_back(new player(players.size(), *winSurface, true));
-						units.push_back(new unit(players.back(), tiles, 0, row, column, window, winSurface));
-						currentunit = units.back();
-					}
-					else if (players.size() < playerlimit)
-					{
-						// std::cout << "Creating AI player" << std::endl;
-						players.push_back(new player(players.size(), *winSurface, false));
-						units.push_back(new unit(players.back(), tiles, 0, row, column, window, winSurface));
-					}
-					else
-					{
-						std::cout << "Exceeded player limit, which is " << playerlimit << std::endl;
-						std::system("pause");
-                                                exit(1);
-					}
-					players.back()->units_.push_back(units.back());
-				}
-				else if (event.button.button == SDL_BUTTON_MIDDLE)
-				{
-					
-				}
+                            gameRunning = handle_keydown(
+                                event.key.keysym.sym, players, currentunit,
+                                units, tiles, factories, winSurface, window);
 				break;
+			case(SDL_MOUSEBUTTONUP):
+                            handle_mouseup(event.button.button, players, currentunit,
+                                           units, tiles, winSurface, window);
+				break;
+			}
 		}
 
 		// done separate from searching every unit, so every unit only has to be searched once
