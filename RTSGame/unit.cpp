@@ -1,4 +1,4 @@
-#pragma once
+
 #include "unit.h"
 #include "tile.h"
 #include "player.h"

@@ -1,7 +1,7 @@
 #include "main.h"
 struct unit;
 struct tile;
-enum Strategy { random, turtle, balanced, aggro };
+enum Strategy { rng, turtle, balanced, aggro };
 
 struct player // Parallel definitions in unit.cpp, tile.cpp, player.h
 {

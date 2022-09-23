@@ -93,19 +93,19 @@ int main(int argc, char** args)
 
 	// Initialize resource timer
 	int resourceMineInterval = 500;
-	Uint64 resourceTimer = SDL_GetTicks64() % resourceMineInterval;
+	Uint64 resourceTimer = SDL_GetTicks() % resourceMineInterval;
 
 	// Initializing spawning timer
 	int unitSpawnInterval = 10000;
-	Uint64 unitSpawnTimer = SDL_GetTicks64() % unitSpawnInterval;
+	Uint64 unitSpawnTimer = SDL_GetTicks() % unitSpawnInterval;
 
 	// Init move timer
 	int unitMoveInterval = 75;
-	Uint64 unitMoveTimer = SDL_GetTicks64() % unitMoveInterval;
+	Uint64 unitMoveTimer = SDL_GetTicks() % unitMoveInterval;
 
 	// Init AI acting timer
 	int aiActInterval = 300;
-	Uint64 aiActTimer = SDL_GetTicks64() % aiActInterval;
+	Uint64 aiActTimer = SDL_GetTicks() % aiActInterval;
 
 	int playerlimit = 15;
 
@@ -251,6 +251,7 @@ int main(int argc, char** args)
 					{
 						std::cout << "Exceeded player limit, which is " << playerlimit << std::endl;
 						std::system("pause");
+                                                exit(1);
 					}
 					players.back()->units_.push_back(units.back());
 				}
@@ -263,26 +264,26 @@ int main(int argc, char** args)
 
 		// done separate from searching every unit, so every unit only has to be searched once
 		bool miningTimerDone = false;
-		if (resourceTimer > SDL_GetTicks64() % resourceMineInterval)
+		if (resourceTimer > SDL_GetTicks() % resourceMineInterval)
 		{
 			miningTimerDone = true;
-			resourceTimer = SDL_GetTicks64() % resourceMineInterval;
+			resourceTimer = SDL_GetTicks() % resourceMineInterval;
 		}
 		else
 		{
-			resourceTimer = SDL_GetTicks64() % resourceMineInterval;
+			resourceTimer = SDL_GetTicks() % resourceMineInterval;
 		}
 
 		// spawning timer flag
 		bool unitSpawnTimerDone = false;
-		if (unitSpawnTimer > SDL_GetTicks64() % unitSpawnInterval)
+		if (unitSpawnTimer > SDL_GetTicks() % unitSpawnInterval)
 		{
 			unitSpawnTimerDone = true;
-			unitSpawnTimer = SDL_GetTicks64() % unitSpawnInterval;
+			unitSpawnTimer = SDL_GetTicks() % unitSpawnInterval;
 		}
 		else
 		{
-			unitSpawnTimer = SDL_GetTicks64() % unitSpawnInterval;
+			unitSpawnTimer = SDL_GetTicks() % unitSpawnInterval;
 		}
 
 		for (auto factory : factories)
@@ -294,25 +295,25 @@ int main(int argc, char** args)
 		}
 
 		bool unitMoveTimerDone = false;
-		if (unitMoveTimer > SDL_GetTicks64() % unitMoveInterval)
+		if (unitMoveTimer > SDL_GetTicks() % unitMoveInterval)
 		{
 			unitMoveTimerDone = true;
-			unitMoveTimer = SDL_GetTicks64() % unitMoveInterval;
+			unitMoveTimer = SDL_GetTicks() % unitMoveInterval;
 		}
 		else
 		{
-			unitMoveTimer = SDL_GetTicks64() % unitMoveInterval;
+			unitMoveTimer = SDL_GetTicks() % unitMoveInterval;
 		}
 
 		bool aiActTimerDone = false;
-		if (aiActTimer > SDL_GetTicks64() % aiActInterval)
+		if (aiActTimer > SDL_GetTicks() % aiActInterval)
 		{
 			aiActTimerDone = true;
-			aiActTimer = SDL_GetTicks64() % aiActInterval;
+			aiActTimer = SDL_GetTicks() % aiActInterval;
 		}
 		else
 		{
-			aiActTimer = SDL_GetTicks64() % aiActInterval;
+			aiActTimer = SDL_GetTicks() % aiActInterval;
 		}
 
 		// Cycle through every player, tell non-humans to perform AI actions

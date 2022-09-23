@@ -4,6 +4,7 @@
 #include "buildfactory.h"
 #include "main.h"
 #include <random>
+#include <algorithm>
 
 auto gen = std::mt19937{ std::random_device{}() };
 
@@ -11,7 +12,7 @@ player::player(int team, SDL_Surface& winSurface, bool human)
 {
 	resources_ = 0;
 	maxResources_ = 100;
-	strat_ = random;
+	strat_ = rng;
 	human_ = human;
 	/*switch (team)
 	{
@@ -87,7 +88,7 @@ void player::act(std::list<unit*>& units, std::list<tile*>& factories, std::vect
 {
 	switch (strat_) 
 	{
-	case(random):
+	case(rng):
 		double r = rand() / double(RAND_MAX);
 		// Possible moves are:
 		// Move fighter (randomly): if this team has a fighter, if there is a valid destination
