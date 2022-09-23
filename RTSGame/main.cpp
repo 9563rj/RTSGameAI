@@ -380,28 +380,6 @@ int runMatch(std::vector<player*>& players, SDL_Surface* winSurface, SDL_Window*
         printf("maxr = %d\n",maxr);
         printf("maxc = %d\n",maxc);
         
-	// init units up here to draw
-	int targr;
-	int targc;
-	int startr;
-	int startc;
-	for (int r = 0; r < tiles.size(); r++)
-	{
-		for (int c = 0; c < tiles[0].size(); c++)
-		{
-			if (tiles[r][c]->state_ == 3)
-			{
-				targr = r;
-				targc = c;
-			}
-			if (tiles[r][c]->state_ == 2)
-			{
-				startr = r;
-				startc = c;
-			}
-		}
-	}
-
 	std::list<unit*> units;
 
         // Each player starts with 1 unit
