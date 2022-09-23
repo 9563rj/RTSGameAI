@@ -1,7 +1,7 @@
 #include "main.h"
 struct unit;
 struct tile;
-enum Strategy { rng, turtle, balanced, aggro };
+enum Strategy { rng, rwa, turtle, balanced, aggro };
 
 struct player // Parallel definitions in unit.cpp, tile.cpp, player.h
 {
@@ -10,9 +10,13 @@ struct player // Parallel definitions in unit.cpp, tile.cpp, player.h
 	player(int team, SDL_Surface &winSurface, bool human);
 	Uint32 teamColor(int team, SDL_Surface &winSurface);
 	Strategy strat_;
-	void act(std::list<unit*>& units, std::list<tile*>& factories, std::vector<std::vector<tile*>>& tiles, SDL_Surface* winSurface, SDL_Window* window);
+	void act(std::list<unit*>& units, std::list<tile*>& factories, std::vector<std::vector<tile*>>& tiles);
 	int resources_;
 	int maxResources_;
 	Uint32 color_;
 	std::list<unit*> units_;
+
+private:
+	void rwa_AI(std::list<unit*>& units, std::list<tile*>& factories, std::vector<std::vector<tile*>>& tiles);
+        
 };

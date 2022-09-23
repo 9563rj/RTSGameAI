@@ -4,12 +4,10 @@
 #include "player.h"
 #include "utils.h"
 
-unit::unit(player* team, const std::vector<std::vector<tile*>>& tiles, const int type, const int row, const int column, SDL_Window* window, SDL_Surface* winSurface)
+unit::unit(player* team, const std::vector<std::vector<tile*>>& tiles, const int type, const int row, const int column)
 {
 	tileAt_ = tiles[row][column];
 	type_ = type;
-	window_ = window;
-	surface_ = winSurface;
 	path_.clear();
 	team_ = team;
 	resourceMineFlag = true;
@@ -73,10 +71,10 @@ void unit::advance(std::vector<std::vector<tile*>>& tiles)
 	}
 }
 
-void unit::navigate(std::vector<std::vector<tile*>>& tiles, std::list<unit*>& units, tile* goal, SDL_Surface* winSurface, SDL_Window* window)
+void unit::navigate(std::vector<std::vector<tile*>>& tiles, std::list<unit*>& units, tile* goal)
 {
 	std::vector<tile*> vectorpath;
-	vectorpath = astar(winSurface, window, tiles, units, tileAt_, goal);
+	vectorpath = astar(tiles, units, tileAt_, goal);
 	path_.clear();
 	for (int i = 0; i < vectorpath.size(); i++)
 	{
@@ -84,7 +82,7 @@ void unit::navigate(std::vector<std::vector<tile*>>& tiles, std::list<unit*>& un
 	}
 }
 
-void unit::buildFactory(std::list<unit*>& units, std::vector<std::vector<tile*>>& tiles, std::list<tile*>& factories, SDL_Surface* winSurface, SDL_Window* window, int factoryTypeSelector)
+void unit::buildFactory(std::list<unit*>& units, std::vector<std::vector<tile*>>& tiles, std::list<tile*>& factories, int factoryTypeSelector)
 {
 	if (units.size() > 0)
 	{
@@ -145,11 +143,11 @@ void unit::buildFactory(std::list<unit*>& units, std::vector<std::vector<tile*>>
 						factories.push_back(this->tileAt_);
 
 						// Create fighter, builder, and miner and add to relevant lists
-						units.push_back(new unit(this->team_, tiles, 1, tileAt_->y_ - 1, tileAt_->x_, window, winSurface));
+						units.push_back(new unit(this->team_, tiles, 1, tileAt_->y_ - 1, tileAt_->x_));
 						//this->team_->units_.push_back(units.back());
-						units.push_back(new unit(this->team_, tiles, 2, tileAt_->y_, tileAt_->x_ + 1, window, winSurface));
+						units.push_back(new unit(this->team_, tiles, 2, tileAt_->y_, tileAt_->x_ + 1));
 						//this->team_->units_.push_back(units.back());
-						units.push_back(new unit(this->team_, tiles, 3, tileAt_->y_ + 1, tileAt_->x_, window, winSurface));
+						units.push_back(new unit(this->team_, tiles, 3, tileAt_->y_ + 1, tileAt_->x_));
 						//this->team_->units_.push_back(units.back());
 
 						// Erase from list of units held by this unit's team

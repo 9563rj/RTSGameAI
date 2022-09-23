@@ -15,7 +15,7 @@ tile::tile(const int& state, int& x, int& y)
 	x_ = x;
 	y_ = y;
 }
-void tile::spawnUnit(const std::vector<std::vector<tile*>>& tiles, std::list<unit*>& units, SDL_Window* window, SDL_Surface* winSurface)
+void tile::spawnUnit(const std::vector<std::vector<tile*>>& tiles, std::list<unit*>& units)
 {
 	if (claimedBy_->resources_ > 9)
 	{
@@ -38,25 +38,25 @@ void tile::spawnUnit(const std::vector<std::vector<tile*>>& tiles, std::list<uni
 		if (validSpawnUp)
 		{
 			claimedBy_->resources_ -= 10;
-			units.push_back(new unit(claimedBy_, tiles, factoryType, y_ - 1, x_, window, winSurface));
+			units.push_back(new unit(claimedBy_, tiles, factoryType, y_ - 1, x_));
 			//claimedBy_->units_.push_back(units.back());
 		}
 		else if (validSpawnLeft)
 		{
 			claimedBy_->resources_ -= 10;
-			units.push_back(new unit(claimedBy_, tiles, factoryType, y_, x_ - 1, window, winSurface));
+			units.push_back(new unit(claimedBy_, tiles, factoryType, y_, x_ - 1));
 			//claimedBy_->units_.push_back(units.back());
 		}
 		else if (validSpawnRight)
 		{
 			claimedBy_->resources_ -= 10;
-			units.push_back(new unit(claimedBy_, tiles, factoryType, y_, x_ + 1, window, winSurface));
+			units.push_back(new unit(claimedBy_, tiles, factoryType, y_, x_ + 1));
 			//claimedBy_->units_.push_back(units.back());
 		}
 		else if (validSpawnDown)
 		{
 			claimedBy_->resources_ -= 10;
-			units.push_back(new unit(claimedBy_, tiles, factoryType, y_ + 1, x_, window, winSurface));
+			units.push_back(new unit(claimedBy_, tiles, factoryType, y_ + 1, x_));
 			//claimedBy_->units_.push_back(units.back());
 		}
 		else

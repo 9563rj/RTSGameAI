@@ -73,10 +73,37 @@ Uint32 player::teamColor(int team, SDL_Surface &winSurface)
 
 enum moveTypes {moveFighter, moveBuilder, buildFactory, moveMiner};
 
-void player::act(std::list<unit*>& units, std::list<tile*>& factories, std::vector<std::vector<tile*>>& tiles, SDL_Surface* winSurface, SDL_Window* window)
+void player::rwa_AI(std::list<unit*>& units, std::list<tile*>& factories, std::vector<std::vector<tile*>>& tiles)
+{
+        for (auto unitPtr : units_)
+        {
+                switch(unitPtr->type_) {
+                case 1: // fighter
+
+                        // choose from:
+                        // attack nearest fighter
+                        // attack nearest miner
+                        // attack nearest factory
+                        
+                        break;
+                case 2: // builder
+                        // build at random location
+                        break;
+                case 3: // miner
+                        // mine nearest unoccupied resource
+                        break;
+                }
+                        
+        }        
+}
+
+void player::act(std::list<unit*>& units, std::list<tile*>& factories, std::vector<std::vector<tile*>>& tiles)
 {
 	switch (strat_) 
 	{
+        case rwa:
+                rwa_AI(units, factories, tiles);
+                break;
 	case(rng):
 		double r = rand() / double(RAND_MAX);
 		// Possible moves are:
@@ -132,7 +159,7 @@ PICK_A_MOVE:
 				std::list<tile*> pickedTile;
 				std::sample(fighters.begin(), fighters.end(), std::back_inserter(pickedFighter), 1, gen);
 				std::sample(openTiles.begin(), openTiles.end(), std::back_inserter(pickedTile), 1, gen);
-				if(pickedFighter.size() > 0 && pickedTile.size() > 0) pickedFighter.back()->navigate(tiles, units, pickedTile.back(), winSurface, window);
+				if(pickedFighter.size() > 0 && pickedTile.size() > 0) pickedFighter.back()->navigate(tiles, units, pickedTile.back());
 				if (pickedFighter.size() == 0) std::cout << "Could not pick a fighter when trying to move fighter" << std::endl;
 				if (pickedTile.size() == 0) std::cout << "Could not pick a tile when trying to move fighter" << std::endl;
 			}
@@ -145,7 +172,7 @@ PICK_A_MOVE:
 				std::list<tile*> pickedTile;
 				std::sample(builders.begin(), builders.end(), std::back_inserter(pickedBuilder), 1, gen);
 				std::sample(openTiles.begin(), openTiles.end(), std::back_inserter(pickedTile), 1, gen);
-				if(pickedBuilder.size() > 0 && pickedTile.size() > 0) pickedBuilder.back()->navigate(tiles, units, pickedTile.back(), winSurface, window);
+				if(pickedBuilder.size() > 0 && pickedTile.size() > 0) pickedBuilder.back()->navigate(tiles, units, pickedTile.back());
 				if (pickedBuilder.size() == 0) std::cout << "Could not pick a builder while trying to move builder" << std::endl;
 				if (pickedTile.size() == 0) std::cout << "Could not pick a tile while trying to move builder" << std::endl;
 			}
@@ -157,7 +184,7 @@ PICK_A_MOVE:
 				std::list<unit*> pickedBuilder;
 				std::sample(builders.begin(), builders.end(), std::back_inserter(pickedBuilder), 1, gen);
 				int factoryType = factoryTypeDistrib(gen);
-				if(pickedBuilder.size()>0) pickedBuilder.back()->buildFactory(units, tiles, factories, winSurface, window, factoryType);
+				if(pickedBuilder.size()>0) pickedBuilder.back()->buildFactory(units, tiles, factories, factoryType);
 				if (pickedBuilder.size() == 0) std::cout << "Could not pick a builder while trying to build factory" << std::endl;
 			}
 			else goto PICK_A_MOVE;
@@ -169,16 +196,15 @@ PICK_A_MOVE:
 				std::list<tile*> pickedOpenResource;
 				std::sample(miners.begin(), miners.end(), std::back_inserter(pickedMiner), 1, gen);
 				std::sample(openResources.begin(), openResources.end(), std::back_inserter(pickedOpenResource), 1, gen);
-				if(pickedMiner.size() > 0 && pickedOpenResource.size() > 0) pickedMiner.back()->navigate(tiles, units, pickedOpenResource.back(), winSurface, window);
+				if(pickedMiner.size() > 0 && pickedOpenResource.size() > 0) pickedMiner.back()->navigate(tiles, units, pickedOpenResource.back());
 				if (pickedMiner.size() == 0) std::cout << "Could not pick a miner while trying to move miner" << std::endl;
 				if (pickedOpenResource.size() == 0) std::cout << "Could not pick an open resource while trying to move miner" << std::endl;
 			}
 		}
 		if (units_.size() == 1)
 		{
-                        printf("units size is 1\n");
 			unit* unitPtr = units_.back();
-			if (unitPtr->type_ == 0) unitPtr->buildFactory(units, tiles, factories, winSurface, window, 2);
+			if (unitPtr->type_ == 0) unitPtr->buildFactory(units, tiles, factories, 2);
 		}
 
 		/*

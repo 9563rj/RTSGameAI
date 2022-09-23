@@ -5,10 +5,10 @@ struct tile;
 struct player;
 struct unit 
 {
-	unit(player* team, const std::vector<std::vector<tile*>>& tiles, const int type, const int row, const int column, SDL_Window* window, SDL_Surface* winSurface);
+	unit(player* team, const std::vector<std::vector<tile*>>& tiles, const int type, const int row, const int column);
 	void advance(std::vector<std::vector<tile*>>& tiles);
-	void navigate(std::vector<std::vector<tile*>>& tiles, std::list<unit*> &units, tile* goal, SDL_Surface* winSurface, SDL_Window* window);
-	void buildFactory(std::list<unit*>& units, std::vector<std::vector<tile*>>& tiles, std::list<tile*>& factories, SDL_Surface* winSurface, SDL_Window* window, int factoryTypeSelector);
+	void navigate(std::vector<std::vector<tile*>>& tiles, std::list<unit*> &units, tile* goal);
+	void buildFactory(std::list<unit*>& units, std::vector<std::vector<tile*>>& tiles, std::list<tile*>& factories, int factoryTypeSelector);
 	bool resourceMineFlag; // whether or not resourceMineRate amount of ms has passed since last resource mined
 	bool unitMoveFlag;
 	int type_;
@@ -19,9 +19,8 @@ struct unit
 	3 = Miner
 	*/
 	int health_;
-	SDL_Window* window_;
-	SDL_Surface* surface_;
 	tile* tileAt_;
 	std::list<tile*> path_;
 	player* team_;
+        bool on_mission_;
 };

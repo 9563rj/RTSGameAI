@@ -45,7 +45,7 @@ bool handle_keydown(SDL_Keycode& key,
 		SDL_GetMouseState(&mousex, &mousey);
 		int row = mousey / tilesize;
 		int column = mousex / tilesize;
-		if(currentunit != NULL) currentunit->buildFactory(units, tiles, factories, winSurface, window, 1);
+		if(currentunit != NULL) currentunit->buildFactory(units, tiles, factories, 1);
 		currentunit = NULL;
 		break;
 	}
@@ -56,7 +56,7 @@ bool handle_keydown(SDL_Keycode& key,
 		SDL_GetMouseState(&mousex, &mousey);
 		int row = mousey / tilesize;
 		int column = mousex / tilesize;
-		if (currentunit != NULL) currentunit->buildFactory(units, tiles, factories, winSurface, window, 2);
+		if (currentunit != NULL) currentunit->buildFactory(units, tiles, factories, 2);
 		currentunit = NULL;
 		break;
 	}
@@ -67,7 +67,7 @@ bool handle_keydown(SDL_Keycode& key,
 		SDL_GetMouseState(&mousex, &mousey);
 		int row = mousey / tilesize;
 		int column = mousex / tilesize;
-		if (currentunit != NULL) currentunit->buildFactory(units, tiles, factories, winSurface, window, 3);
+		if (currentunit != NULL) currentunit->buildFactory(units, tiles, factories, 3);
 		currentunit = NULL;
 		break;
 	}
@@ -123,7 +123,7 @@ void handle_mouseup(Uint8 button, std::vector<player*>& players,
                 }
                 // std::cout << "setting new goal to r=" << row << " and c=" << column << std::endl;
                 // tiles[row][column]->state_ = 3;
-                currentunit->navigate(tiles, units, tiles[row][column], winSurface, window);
+                currentunit->navigate(tiles, units, tiles[row][column]);
             }
             else if (tiles[row][column]->magicflag != 62)
             {
@@ -143,14 +143,14 @@ void handle_mouseup(Uint8 button, std::vector<player*>& players,
         {
             // std::cout << "Creating human player" << std::endl;
             players.push_back(new player(players.size(), *winSurface, true));
-            units.push_back(new unit(players.back(), tiles, 0, row, column, window, winSurface));
+            units.push_back(new unit(players.back(), tiles, 0, row, column));
             currentunit = units.back();
         }
         else if (players.size() < playerlimit)
         {
             // std::cout << "Creating AI player" << std::endl;
             players.push_back(new player(players.size(), *winSurface, false));
-            units.push_back(new unit(players.back(), tiles, 0, row, column, window, winSurface));
+            units.push_back(new unit(players.back(), tiles, 0, row, column));
         }
         else
         {
@@ -181,7 +181,6 @@ int updateState(std::vector<player*>& players, unit* currentunit, std::list<unit
         resourceTimer = SDL_GetTicks() % resourceMineInterval;
 
         bool unitSpawnTimerDone = false;
-        printf("unitSpawnTimer = %d\n",int(unitSpawnTimer));
         if (unitSpawnTimer > SDL_GetTicks() % unitSpawnInterval)
         {
                 unitSpawnTimerDone = true;
@@ -202,15 +201,12 @@ int updateState(std::vector<player*>& players, unit* currentunit, std::list<unit
         }
         aiActTimer = SDL_GetTicks() % aiActInterval;
 
-        printf("unitSpawnTimerDone = %d\n",unitSpawnTimerDone);
-        printf("unitMoveTimerDone = %d\n",unitMoveTimerDone);
-        
         // Spawn units
         if (unitSpawnTimerDone)
         {
                 for (auto factory : factories)
                 {
-                        factory->spawnUnit(tiles, units, window, winSurface);
+                        factory->spawnUnit(tiles, units);
                 }
         }
 
@@ -221,7 +217,7 @@ int updateState(std::vector<player*>& players, unit* currentunit, std::list<unit
                 {
                         if (!playerPtr->human_)
                         {
-                                playerPtr->act(units, factories, tiles, winSurface, window);
+                                playerPtr->act(units, factories, tiles);
                         }
                 }
         }
@@ -426,8 +422,8 @@ int runMatch(std::vector<player*>& players, SDL_Surface* winSurface, SDL_Window*
 
         printf("(%d,%d) for player 0\n",row0,col0);
         printf("(%d,%d) for player 1\n",row1,col1);
-        units.push_back(new unit(players[0], tiles, 0, row0, col0, window, winSurface));
-        units.push_back(new unit(players[1], tiles, 0, row1, col1, window, winSurface));
+        units.push_back(new unit(players[0], tiles, 0, row0, col0));
+        units.push_back(new unit(players[1], tiles, 0, row1, col1));
 
 	// Create unit, initialize, create path variable
 	

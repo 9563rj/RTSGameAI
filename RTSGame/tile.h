@@ -8,7 +8,7 @@ struct tile
 	int magicflag;
 	int state_;
 	int factoryType; // corresponds to unit types, except 0 is not a factory
-	void spawnUnit(const std::vector<std::vector<tile*>>& tiles, std::list<unit*>& units, SDL_Window* window, SDL_Surface* winSurface);
+	void spawnUnit(const std::vector<std::vector<tile*>>& tiles, std::list<unit*>& units);
 	/*States
 	0 = Open
 	1 = Wall
