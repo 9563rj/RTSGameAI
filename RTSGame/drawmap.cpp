@@ -3,6 +3,10 @@
 
 void drawMap(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vector<tile*>> &tiles, std::list<unit*>& units, std::vector<player*>& players)
 {
+        const int boardlox = 100+2*tilesize;
+        const int boardloy = 0;
+
+        // Draw tiles
 	SDL_Rect drawRect;
 	drawRect.h = tilesize;
 	drawRect.w = tilesize;
@@ -12,8 +16,8 @@ void drawMap(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vecto
 		{
 			//Debug
 			//std::cout << "Attempting to draw tile x=" << i << " y=" << j << std::endl;
-			drawRect.x = i * tilesize;
-			drawRect.y = j * tilesize;
+			drawRect.x = boardlox +i*tilesize;
+			drawRect.y = boardloy +j*tilesize;
 			SDL_FillRect(winSurface, &drawRect, tiles[j][i]->getColor(*winSurface));
 			switch (tiles[j][i]->factoryType) 
 			{
@@ -71,52 +75,54 @@ void drawMap(SDL_Surface* winSurface, SDL_Window* window, std::vector<std::vecto
 			}
 			*/
 
-			// Render units
-			// Optimization note: This searches every single unit for every single tile (redundant)
-			// Optimize by having each tile know whether or not there's a unit on it, and checking that and the corresponding unit
-			for (auto unitPtr : units)
-			{
-				if (unitPtr->tileAt_->x_ == i && unitPtr->tileAt_->y_ == j)
-				{
-					drawRect.h -= 10;
-					drawRect.w -= 10;
-					drawRect.x += 5;
-					drawRect.y += 5;
-					SDL_FillRect(winSurface, &drawRect, unitPtr->team_->color_);
-					switch (unitPtr->type_)
-					{
-					case(0): // Main Unit
-						break;
-					case(1): // Fighter
-						drawRect.h = 15;
-						drawRect.w = 3;
-						drawRect.x += 6;
-						SDL_FillRect(winSurface, &drawRect, SDL_MapRGB(winSurface->format, 0, 255, 0));
-						drawRect.h = 3;
-						drawRect.w = 15;
-						drawRect.x -= 6;
-						drawRect.y += 6;
-						SDL_FillRect(winSurface, &drawRect, SDL_MapRGB(winSurface->format, 0, 255, 0));
-						break;
-					case(2): // Builder
-						drawRect.h = 15;
-						drawRect.w = 3;
-						drawRect.x += 6;
-						SDL_FillRect(winSurface, &drawRect, SDL_MapRGB(winSurface->format, 0, 255, 0));
-					case(3): // Miner
-						drawRect.h -= 8;
-						drawRect.w -= 8;
-						drawRect.x += 4;
-						drawRect.y += 4;
-						SDL_FillRect(winSurface, &drawRect, SDL_MapRGB(winSurface->format, 0, 255, 0));
-						break;
-					}
-					drawRect.h = tilesize;
-					drawRect.w = tilesize;
-				}
-			}
-		}
-	}
+                }
+        }
+
+
+        // Render units
+        for (auto unitPtr : units)
+        {
+                int i = unitPtr->tileAt_->x_;
+                int j = unitPtr->tileAt_->y_;
+                drawRect.x = boardlox +i*tilesize;
+                drawRect.y = boardloy +j*tilesize;
+                drawRect.h -= 10;
+                drawRect.w -= 10;
+                drawRect.x += 5;
+                drawRect.y += 5;
+                SDL_FillRect(winSurface, &drawRect, unitPtr->team_->color_);
+                switch (unitPtr->type_)
+                {
+                case(0): // Main Unit
+                        break;
+                case(1): // Fighter
+                        drawRect.h = 15;
+                        drawRect.w = 3;
+                        drawRect.x += 6;
+                        SDL_FillRect(winSurface, &drawRect, SDL_MapRGB(winSurface->format, 0, 255, 0));
+                        drawRect.h = 3;
+                        drawRect.w = 15;
+                        drawRect.x -= 6;
+                        drawRect.y += 6;
+                        SDL_FillRect(winSurface, &drawRect, SDL_MapRGB(winSurface->format, 0, 255, 0));
+                        break;
+                case(2): // Builder
+                        drawRect.h = 15;
+                        drawRect.w = 3;
+                        drawRect.x += 6;
+                        SDL_FillRect(winSurface, &drawRect, SDL_MapRGB(winSurface->format, 0, 255, 0));
+                case(3): // Miner
+                        drawRect.h -= 8;
+                        drawRect.w -= 8;
+                        drawRect.x += 4;
+                        drawRect.y += 4;
+                        SDL_FillRect(winSurface, &drawRect, SDL_MapRGB(winSurface->format, 0, 255, 0));
+                        break;
+                }
+                drawRect.h = tilesize;
+                drawRect.w = tilesize;
+        }
+
 	// Start resource bars at corner of border corner tile
 	drawRect.x = tilesize;
 	drawRect.y = tilesize;
