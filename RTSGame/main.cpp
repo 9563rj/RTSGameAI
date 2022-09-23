@@ -15,6 +15,10 @@ const int unitSpawnInterval = 10000;
 const int unitMoveInterval = 75;
 const int aiActInterval = 300;
 
+// board size
+int maxr;
+int maxc;
+
 bool handle_keydown(SDL_Keycode& key,
                     std::vector<player*>& players,
                     unit* currentunit,
@@ -154,7 +158,7 @@ void handle_mouseup(Uint8 button, std::vector<player*>& players,
             std::system("pause");
             exit(1);
         }
-        players.back()->units_.push_back(units.back());
+        //players.back()->units_.push_back(units.back());
     }
     else if (button == SDL_BUTTON_MIDDLE)
     {
@@ -177,6 +181,7 @@ int updateState(std::vector<player*>& players, unit* currentunit, std::list<unit
         resourceTimer = SDL_GetTicks() % resourceMineInterval;
 
         bool unitSpawnTimerDone = false;
+        printf("unitSpawnTimer = %d\n",int(unitSpawnTimer));
         if (unitSpawnTimer > SDL_GetTicks() % unitSpawnInterval)
         {
                 unitSpawnTimerDone = true;
@@ -197,6 +202,9 @@ int updateState(std::vector<player*>& players, unit* currentunit, std::list<unit
         }
         aiActTimer = SDL_GetTicks() % aiActInterval;
 
+        printf("unitSpawnTimerDone = %d\n",unitSpawnTimerDone);
+        printf("unitMoveTimerDone = %d\n",unitMoveTimerDone);
+        
         // Spawn units
         if (unitSpawnTimerDone)
         {
@@ -365,19 +373,17 @@ int initSDL(SDL_Surface*& winSurface, SDL_Window*& window)
         return 0;
 }
 
-
-int main(int argc, char** args)
+int runMatch(std::vector<player*>& players, SDL_Surface* winSurface, SDL_Window* window)
 {
-	SDL_Surface* winSurface = NULL;
-	SDL_Window* window = NULL;
-
-        int err = initSDL(winSurface, window);
-        if (err) exit(err);
-
 	// Map init
 	std::vector<std::vector<tile*>> tiles;
 	initMap(tiles, false, false);
 
+        maxr = tiles.size();
+        maxc = tiles[0].size();
+        printf("maxr = %d\n",maxr);
+        printf("maxc = %d\n",maxc);
+        
 	// init units up here to draw
 	int targr;
 	int targc;
@@ -401,7 +407,27 @@ int main(int argc, char** args)
 	}
 
 	std::list<unit*> units;
-	std::vector<player*> players;
+
+        // Each player starts with 1 unit
+        double ra = rand()/double(RAND_MAX);
+        double rb = rand()/double(RAND_MAX);
+
+        int maxr0 = maxr/2;
+        int minr0 = 1;
+
+        int maxc0 = maxc/2;
+        int minc0 = 1;
+        
+        int row0 = minr0 +ra*maxr0;
+        int col0 = minc0 +rb*maxc0;
+        
+        int row1 = maxr-row0-1;
+        int col1 = maxc-col0-1;
+
+        printf("(%d,%d) for player 0\n",row0,col0);
+        printf("(%d,%d) for player 1\n",row1,col1);
+        units.push_back(new unit(players[0], tiles, 0, row0, col0, window, winSurface));
+        units.push_back(new unit(players[1], tiles, 0, row1, col1, window, winSurface));
 
 	// Create unit, initialize, create path variable
 	
@@ -414,7 +440,9 @@ int main(int argc, char** args)
 	// Event loop
 	bool gameRunning = true;
 	SDL_Event event;
-	
+
+        int winner = -1;
+        
 	// Main game loop
 	while (gameRunning)
 	{
@@ -433,14 +461,14 @@ int main(int argc, char** args)
                                 units, tiles, factories, winSurface, window);
                             if (!gameRunning) goto gameover;
 			case(SDL_MOUSEBUTTONUP):
-                            handle_mouseup(event.button.button, players, currentunit,
-                                           units, tiles, winSurface, window);
+                            // handle_mouseup(event.button.button, players, currentunit,
+                            //                units, tiles, winSurface, window);
                             break;
 			}
 		}
 
-                int winner = updateState(players, currentunit, units, tiles,
-                                         factories, winSurface, window);
+                winner = updateState(players, currentunit, units, tiles,
+                                     factories, winSurface, window);
 
 		drawMap(winSurface, window, tiles, units, players);
 
@@ -455,6 +483,29 @@ int main(int argc, char** args)
 
 gameover:
         std::cout << "Game Over" << std::endl;
+
+        return winner;
+}
+
+int main(int argc, char** args)
+{
+	SDL_Surface* winSurface = NULL;
+	SDL_Window* window = NULL;
+
+        int err = initSDL(winSurface, window);
+        if (err) exit(err);
+
+        // 1 vs 1
+	std::vector<player*> players;
+        players.push_back(new player(0, *winSurface, false));
+        players.push_back(new player(1, *winSurface, false));
+
+        // Run tournament
+        int N = 2;
+        for (int n = 0; n < N; n++) {
+                int winner = runMatch(players, winSurface, window);
+                printf("%d wins match %d/%d\n",winner,n+1,N);
+        }
 
 	// Cleanup
 	SDL_FreeSurface(winSurface);

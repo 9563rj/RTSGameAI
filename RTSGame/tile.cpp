@@ -39,25 +39,25 @@ void tile::spawnUnit(const std::vector<std::vector<tile*>>& tiles, std::list<uni
 		{
 			claimedBy_->resources_ -= 10;
 			units.push_back(new unit(claimedBy_, tiles, factoryType, y_ - 1, x_, window, winSurface));
-			claimedBy_->units_.push_back(units.back());
+			//claimedBy_->units_.push_back(units.back());
 		}
 		else if (validSpawnLeft)
 		{
 			claimedBy_->resources_ -= 10;
 			units.push_back(new unit(claimedBy_, tiles, factoryType, y_, x_ - 1, window, winSurface));
-			claimedBy_->units_.push_back(units.back());
+			//claimedBy_->units_.push_back(units.back());
 		}
 		else if (validSpawnRight)
 		{
 			claimedBy_->resources_ -= 10;
 			units.push_back(new unit(claimedBy_, tiles, factoryType, y_, x_ + 1, window, winSurface));
-			claimedBy_->units_.push_back(units.back());
+			//claimedBy_->units_.push_back(units.back());
 		}
 		else if (validSpawnDown)
 		{
 			claimedBy_->resources_ -= 10;
 			units.push_back(new unit(claimedBy_, tiles, factoryType, y_ + 1, x_, window, winSurface));
-			claimedBy_->units_.push_back(units.back());
+			//claimedBy_->units_.push_back(units.back());
 		}
 		else
 		{

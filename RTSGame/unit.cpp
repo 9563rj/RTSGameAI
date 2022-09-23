@@ -29,6 +29,7 @@ unit::unit(player* team, const std::vector<std::vector<tile*>>& tiles, const int
 		health_ = 100;
 		break;
 	}
+        team->units_.push_back(this);
 }
 
 void unit::advance(std::vector<std::vector<tile*>>& tiles)
@@ -145,11 +146,11 @@ void unit::buildFactory(std::list<unit*>& units, std::vector<std::vector<tile*>>
 
 						// Create fighter, builder, and miner and add to relevant lists
 						units.push_back(new unit(this->team_, tiles, 1, tileAt_->y_ - 1, tileAt_->x_, window, winSurface));
-						this->team_->units_.push_back(units.back());
+						//this->team_->units_.push_back(units.back());
 						units.push_back(new unit(this->team_, tiles, 2, tileAt_->y_, tileAt_->x_ + 1, window, winSurface));
-						this->team_->units_.push_back(units.back());
+						//this->team_->units_.push_back(units.back());
 						units.push_back(new unit(this->team_, tiles, 3, tileAt_->y_ + 1, tileAt_->x_, window, winSurface));
-						this->team_->units_.push_back(units.back());
+						//this->team_->units_.push_back(units.back());
 
 						// Erase from list of units held by this unit's team
 						std::list<unit*>& teamUnitList = this->team_->units_;

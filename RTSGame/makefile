@@ -3,17 +3,13 @@ DBG=-g
 
 CPPFLAGS=-I/usr/include/SDL2 $(DBG)
 
-all:
-	g++ $(CPPFLAGS) main.cpp utils.o unit.o tile.o player.o drawmap.o buildfactory.o astar.o -lSDL2
+OBJS := astar.o buildfactory.o drawmap.o player.o tile.o unit.o utils.o
 
-rebuild:
-	g++ -c $(CPPFLAGS) astar.cpp
-	g++ -c $(CPPFLAGS) buildfactory.cpp
-	g++ -c $(CPPFLAGS) drawmap.cpp
-	g++ -std=c++17 -c $(CPPFLAGS) player.cpp
-	g++ -c $(CPPFLAGS) tile.cpp
-	g++ -c $(CPPFLAGS) unit.cpp
-	g++ -c $(CPPFLAGS) utils.cpp
+%.o: %.cpp
+	g++ -c -std=c++17 $(CPPFLAGS) $*.cpp
+
+all: $(OBJS)
+	g++ $(CPPFLAGS) main.cpp $(OBJS) -lSDL2
 
 clean:
 	rm a.out utils.o unit.o tile.o player.o drawmap.o buildfactory.o astar.o

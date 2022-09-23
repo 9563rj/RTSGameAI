@@ -176,6 +176,7 @@ PICK_A_MOVE:
 		}
 		if (units_.size() == 1)
 		{
+                        printf("units size is 1\n");
 			unit* unitPtr = units_.back();
 			if (unitPtr->type_ == 0) unitPtr->buildFactory(units, tiles, factories, winSurface, window, 2);
 		}
