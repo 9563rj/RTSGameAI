@@ -476,8 +476,18 @@ int main(int argc, char** args)
         // Run tournament
         int N = 2;
         for (int n = 0; n < N; n++) {
-                int winner = runMatch(players, winSurface, window);
-                printf("%d wins match %d/%d\n",winner,n+1,N);
+
+                {
+                        std::vector<player*> players;
+                        players.push_back(new player(0, *winSurface, false));
+                        players.push_back(new player(1, *winSurface, false));
+                        
+                        int winner = runMatch(players, winSurface, window);
+                        printf("%d wins match %d/%d\n",winner,n+1,N);
+
+                        delete players[0];
+                        delete players[1];
+                }
         }
 
 	// Cleanup
