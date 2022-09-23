@@ -166,6 +166,11 @@ void handle_mouseup(Uint8 button, std::vector<player*>& players,
     }
 }
 
+// return code is a game status:
+//  0: no winner yet, continue playing
+// -1: stalemate, no player can win
+// >0: team_id of winner (1-based)
+
 int updateState(std::vector<player*>& players, unit* currentunit, std::list<unit*>& units, std::vector<std::vector<tile*>>& tiles, std::list<tile*>& factories, SDL_Surface* winSurface, SDL_Window* window)
 {
 	static Uint64 resourceTimer = SDL_GetTicks() % resourceMineInterval;
@@ -300,7 +305,9 @@ int updateState(std::vector<player*>& players, unit* currentunit, std::list<unit
         }
 
 
-        // Win conditions: if player has no factories or units, it is a dead player, and if only one player left and has units and factories, that player wins
+        // Win conditions: if player has no factories or units, it is
+        // a dead player, and if only one player left and has units
+        // and factories, that player wins
         std::list<player*> deadPlayers;
         for (auto playerPtr : players)
         {
@@ -332,7 +339,20 @@ int updateState(std::vector<player*>& players, unit* currentunit, std::list<unit
                 return players[0]->team_id_;
         }
 
-        return 0; // no winner
+        // Check for stalemate. A stalemate occurs when no player has
+        // a fighters, fighter factories, or main units left.
+        bool playerHasFighters = false;
+        for (auto playerPtr : players)
+        {
+                for (auto unit : playerPtr->units_) {
+                        if (unit->type_ == 0) playerHasFighters = true;
+                        if (unit->type_ == 1) playerHasFighters = true;
+                        if (playerHasFighters) break;
+                }
+        }
+        if (!playerHasFighters) return -1; // stalemate
+        
+        return 0; // no winner, continue playing
 }
 
 int initSDL(SDL_Surface*& winSurface, SDL_Window*& window, int winx, int winy)
@@ -362,6 +382,10 @@ int initSDL(SDL_Surface*& winSurface, SDL_Window*& window, int winx, int winy)
 
         return 0;
 }
+
+// run match and return game result.
+// >0: team_id of winner
+//  0: stalemate; no winner
 
 int runMatch(std::vector<player*>& players, SDL_Surface* winSurface, SDL_Window* window)
 {
@@ -408,7 +432,7 @@ int runMatch(std::vector<player*>& players, SDL_Surface* winSurface, SDL_Window*
 	bool gameRunning = true;
 	SDL_Event event;
 
-        int winner_id = 0;
+        int game_status;
         
 	// Main game loop
 	while (gameRunning)
@@ -434,12 +458,12 @@ int runMatch(std::vector<player*>& players, SDL_Surface* winSurface, SDL_Window*
 			}
 		}
 
-                winner_id = updateState(players, currentunit, units, tiles,
-                                        factories, winSurface, window);
+                game_status = updateState(players, currentunit, units, tiles,
+                                          factories, winSurface, window);
 
 		drawMap(winSurface, window, tiles, units, players);
 
-                if (winner_id) goto gameover;
+                if (game_status) goto gameover;
                 
 		// FPS counter
 		// Uint64 end = SDL_GetPerformanceCounter();
@@ -451,7 +475,11 @@ int runMatch(std::vector<player*>& players, SDL_Surface* winSurface, SDL_Window*
 gameover:
         std::cout << "Game Over" << std::endl;
 
-        return winner_id;
+        // stalemate
+        if (game_status == -1) return 0;
+
+        // winner id
+        return game_status;
 }
 
 int main(int argc, char** args)
@@ -491,10 +519,16 @@ int main(int argc, char** args)
                         players.push_back(new player(0, *winSurface, false));
                         players.push_back(new player(1, *winSurface, false));
                         
-                        int winner_id = runMatch(players, winSurface, window);
-                        printf("%d wins match %d/%d\n",winner_id,n+1,N);
+                        int match_result = runMatch(players, winSurface, window);
 
-                        if (winner_id) delete players[winner_id-1];
+                        if (!match_result) {
+                                printf("match %d/%d is a stalemate\n",n+1,N);
+                        }
+                        else {
+                                printf("player %d wins match %d/%d\n",match_result,n+1,N);
+                                delete players[match_result-1];
+                        }
+                        //int c = getchar();
                 }
         }
 
