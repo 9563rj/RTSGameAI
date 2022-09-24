@@ -6,6 +6,8 @@
 #include "player.h"
 #include "buildfactory.h"
 
+#include <random>
+
 const int tilesize = 25;
 const int playerlimit = 15;
 
@@ -18,6 +20,8 @@ const int aiActInterval = 300;
 // board size
 int maxr;
 int maxc;
+
+auto gen = std::mt19937{ std::random_device{}() };
 
 bool handle_keydown(SDL_Keycode& key,
                     std::vector<player*>& players,
@@ -228,32 +232,66 @@ int updateState(std::vector<player*>& players, unit* currentunit, std::list<unit
         }
 
         // Cycle through every unit, compute combat, mining, and moving
-        std::list<unit*> deadUnits;
         std::list<tile*> deadFactories;
-        for(auto unitPtr : units)
+        for (auto unitPtr : units)
         {
+                //printf("player %d updating unit of type %d\n",unitPtr->team_->team_id_,unitPtr->type_);
                 if (unitMoveTimerDone) unitPtr->unitMoveFlag = true;
-                if (unitPtr->type_ == 1)
+                if (unitPtr->type_ == fighter)
                 {
-                        for (auto targetPtr : units)
-                        {
-                                int targetX = targetPtr->tileAt_->x_;
-                                int targetY = targetPtr->tileAt_->y_;
-                                int selfX = unitPtr->tileAt_->x_;
-                                int selfY = unitPtr->tileAt_->y_;
-					
-                                bool above = (targetX == selfX && targetY == selfY - 1);
-                                bool left = (targetX == selfX - 1 && targetY == selfY);
-                                bool right = (targetX == selfX + 1 && targetY == selfY);
-                                bool below = (targetX == selfX && targetY == selfY + 1);
-                                if ((above || left || right || below) && (targetPtr->team_ != unitPtr->team_))
-                                {
-                                        targetPtr->health_ -= 1;
-                                        bool alreadyDeadCheck = deadUnits.end() == std::find(deadUnits.begin(), deadUnits.end(), targetPtr);
-                                        if (targetPtr->health_ < 1 && alreadyDeadCheck) deadUnits.push_back(targetPtr);
+                        // Here we should not iterate through all units, but just check tiles
+                        int r = unitPtr->tileAt_->y_;
+                        int c = unitPtr->tileAt_->x_;
+
+                        tile* lft_tile = tiles[r][c-1];
+                        tile* rgt_tile = tiles[r][c+1];
+                        tile* top_tile = tiles[r-1][c];
+                        tile* bot_tile = tiles[r+1][c];
+
+                        unit* lft = lft_tile->unitAt_;
+                        unit* rgt = rgt_tile->unitAt_;
+                        unit* top = top_tile->unitAt_;
+                        unit* bot = bot_tile->unitAt_;
+
+                        // if (lft) printf("  has lft nbr\n");
+                        // if (rgt) printf("  has rgt nbr\n");
+                        // if (top) printf("  has top nbr\n");
+                        // if (bot) printf("  has bot nbr\n");
+
+                        player* myteam = unitPtr->team_;
+                        
+                        std::vector<unit*> targets;
+                        if (lft && lft->team_ != myteam) targets.push_back(lft);
+                        if (rgt && rgt->team_ != myteam) targets.push_back(rgt);
+                        if (top && top->team_ != myteam) targets.push_back(top);
+                        if (bot && bot->team_ != myteam) targets.push_back(bot);
+                        if (targets.size()) {
+                                //printf("%lu targets\n",targets.size());
+                                // char a = getchar();
+                                // exit(1);
+                        }
+
+                        // choose a random target to attack
+                        if (targets.size()) {
+                                std::uniform_int_distribution<> targdist(0,targets.size()-1);
+                                int itarget = targdist(gen);
+                                //printf("choosing target %d\n",itarget);
+                                unit* target = targets[itarget];
+
+                                std::uniform_real_distribution<> hitdist(0, 1.0);
+                                double ahit = hitdist(gen);
+
+                                // 70% chance of hitting. If there's
+                                // no randomness for hits, then two
+                                // units fighting will always kill
+                                // both, or kill one just by who takes
+                                // the first turn.
+                                
+                                if (ahit < 0.5) {
+                                        target->health_ -= 1;
                                 }
                         }
-                        //for (auto targetPtr : factories)
+                            
                         for(std::list<tile*>::iterator it = factories.begin(); it != factories.end(); it++)
                         {
                                 tile* targetPtr = *it;
@@ -279,9 +317,17 @@ int updateState(std::vector<player*>& players, unit* currentunit, std::list<unit
                                         }
                                 }
                         }
-                }
+                        
+                } // fighter units
+
                 if (miningTimerDone) unitPtr->resourceMineFlag = true;
                 unitPtr->advance(tiles);
+        }
+
+        // kill units with 0 health
+        std::list<unit*> deadUnits;
+        for (auto unitPtr : units) {
+                if (unitPtr->health_ <= 0) deadUnits.push_back(unitPtr);
         }
 
         // Kill units that died during this frame, avoids modifying actively iterated lists
@@ -300,7 +346,7 @@ int updateState(std::vector<player*>& players, unit* currentunit, std::list<unit
 
 
                 units.erase(std::find(units.begin(), units.end(), deadPtr));
-                deadPtr->tileAt_->unitAt_ = NULL; // "corpse" removed from tile
+                deadPtr->tileAt_->unitAt_ = nullptr; // "corpse" removed from tile
                 delete deadPtr;
         }
 
@@ -311,6 +357,12 @@ int updateState(std::vector<player*>& players, unit* currentunit, std::list<unit
         std::list<player*> deadPlayers;
         for (auto playerPtr : players)
         {
+                bool hasNoFighters = true;
+                for (auto unit : playerPtr->units_) {
+                        if (unit->type_ == mainunit) hasNoFighters = false;
+                        if (unit->type_ == fighter) hasNoFighters = false;
+                }
+                
                 bool hasNoFactories = true;
                 for (auto factoryPtr : factories)
                 {
@@ -320,9 +372,8 @@ int updateState(std::vector<player*>& players, unit* currentunit, std::list<unit
                         }
                 }
                 bool hasNoUnits = !playerPtr->units_.size();
-                if (hasNoUnits && hasNoFactories)
+                if (hasNoFighters || (hasNoUnits && hasNoFactories))
                 {
-                        printf("player %d is dead\n",playerPtr->team_id_);
                         deadPlayers.push_back(playerPtr);
                 }
         }
@@ -333,9 +384,13 @@ int updateState(std::vector<player*>& players, unit* currentunit, std::list<unit
                 players.erase(std::find(players.begin(), players.end(), playerPtr));
         }
 
+        if (players.size() == 0) {
+                return -1;
+        }
+        
+
         if (players.size() == 1)
         {
-                printf("** player %d wins! **\n",players[0]->team_id_);
                 return players[0]->team_id_;
         }
 
@@ -345,10 +400,11 @@ int updateState(std::vector<player*>& players, unit* currentunit, std::list<unit
         for (auto playerPtr : players)
         {
                 for (auto unit : playerPtr->units_) {
-                        if (unit->type_ == 0) playerHasFighters = true;
-                        if (unit->type_ == 1) playerHasFighters = true;
+                        if (unit->type_ == mainunit) playerHasFighters = true;
+                        if (unit->type_ == fighter) playerHasFighters = true;
                         if (playerHasFighters) break;
                 }
+                // TODO: check for fighter factories
         }
         if (!playerHasFighters) return -1; // stalemate
         
@@ -461,9 +517,12 @@ int runMatch(std::vector<player*>& players, SDL_Surface* winSurface, SDL_Window*
                 game_status = updateState(players, currentunit, units, tiles,
                                           factories, winSurface, window);
 
-		drawMap(winSurface, window, tiles, units, players);
-
-                if (game_status) goto gameover;
+		if (game_status == 0) {
+                        drawMap(winSurface, window, tiles, units, players);
+                }
+                else {
+                        break;
+                }
                 
 		// FPS counter
 		// Uint64 end = SDL_GetPerformanceCounter();
@@ -473,8 +532,6 @@ int runMatch(std::vector<player*>& players, SDL_Surface* winSurface, SDL_Window*
 	}
 
 gameover:
-        std::cout << "Game Over" << std::endl;
-
         // stalemate
         if (game_status == -1) return 0;
 
@@ -514,6 +571,8 @@ int main(int argc, char** args)
 
         // Run tournament
         int N = 10;
+        int player1wins = 0;
+        int player2wins = 0;
         for (int n = 0; n < N; n++) {
 
                 printf("Running match %d/%d\n",n+1,N);
@@ -530,10 +589,13 @@ int main(int argc, char** args)
                         else {
                                 printf("player %d wins match %d/%d\n",match_result,n+1,N);
                                 delete players[match_result-1];
+                                if (match_result == 1) player1wins++;
+                                if (match_result == 2) player2wins++;
                         }
-                        //int c = getchar();
                 }
         }
+        int ties = N-player1wins-player2wins;
+        printf("%f|%f|%f\n",player1wins/double(N)*100,player2wins/double(N)*100,ties/double(N)*100);
 
 	// Cleanup
 	SDL_FreeSurface(winSurface);

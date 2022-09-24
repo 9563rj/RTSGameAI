@@ -6,7 +6,7 @@
 #include <random>
 #include <algorithm>
 
-auto gen = std::mt19937{ std::random_device{}() };
+extern std::mt19937 gen;
 
 player::player(int team, SDL_Surface& winSurface, bool human)
 {
